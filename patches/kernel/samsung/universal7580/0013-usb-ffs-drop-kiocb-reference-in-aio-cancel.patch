@@ -1,0 +1,23 @@
+diff --git a/drivers/usb/gadget/function/f_fs.c b/drivers/usb/gadget/function/f_fs.c
+index 3b050d01..df263593 100644
+--- a/drivers/usb/gadget/function/f_fs.c
++++ b/drivers/usb/gadget/function/f_fs.c
+@@ -1100,6 +1100,18 @@ static int ffs_aio_cancel(struct kiocb *kiocb, struct io_event *event)
+ 
+ 	spin_unlock_irqrestore(&epfile->ffs->eps_lock, flags);
+ 
++	/*
++	 * gvwifi: on 3.10, kiocb_cancel() takes an extra reference on the kiocb
++	 * before calling the cancel callback and expects the callback to drop it
++	 * (see ep_aio_cancel() in gadget/inode.c). This backported callback
++	 * follows the 3.15+ convention and never did, so every cancelled request
++	 * leaked its kiocb and with it the endpoint file. When adbd exits with
++	 * reads pending (adb root, USB mode switch) the epfiles stay open, the
++	 * function never resets, and the next adbd's descriptor write fails with
++	 * -ESRCH: USB adb goes offline and MTP mode switching fails.
++	 */
++	aio_put_req(kiocb);
++
+ 	return value;
+ }
+ 

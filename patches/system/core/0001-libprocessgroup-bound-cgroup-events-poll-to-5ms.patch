@@ -1,0 +1,20 @@
+diff --git a/libprocessgroup/processgroup.cpp b/libprocessgroup/processgroup.cpp
+index cea22b7..3a1f1f0 100644
+--- a/libprocessgroup/processgroup.cpp
++++ b/libprocessgroup/processgroup.cpp
+@@ -621,8 +621,14 @@ static int KillProcessGroup(
+             const std::chrono::steady_clock::time_point poll_start =
+                     std::chrono::steady_clock::now();
+ 
++            // gvwifi: the 3.10 kernel's backported cgroup.events reports "populated" correctly
++            // but never raises POLLPRI, so an unbounded poll always slept until the 2200 ms
++            // deadline: every `stop` took 2.2 s and UsbDeviceManager's 1 s wait for
++            // sys.usb.state=none failed (no MTP). Re-check at least every 5 ms, as the
++            // retry loop this replaced did.
+             if (poll_start < until)
+-                ret = TEMP_FAILURE_RETRY(poll(&fds, 1, toMillisec(until - poll_start).count()));
++                ret = TEMP_FAILURE_RETRY(poll(&fds, 1,
++                        std::min(5ms, toMillisec(until - poll_start)).count()));
+ 
+             if (ret == -1) {
+                 // Fallback to 5ms sleeps if poll fails

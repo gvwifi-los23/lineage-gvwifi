@@ -105,4 +105,4 @@ LineageOS 23.2 from the github.com/gvwifi trees plus the patches in `gvwifi-los2
 - Crash-loop fixes (BpfNetMaps `ENOSYS`, ART zygote JIT without `memfd_create`).
 - Present fences, INT bus floor (no video judder), CPU/GPU ramp tuning.
 - Low-RAM tuning, built in as defaults.
-- **gvwifi Tweaks** setup app. USB reconnects after mode switches (sideload, MTP).
+- **gvwifi Tweaks** setup app. USB reconnects after mode switches (sideload), and MTP file transfer works.

@@ -3,12 +3,12 @@
 Base: LineageOS 23.2 (Android 16, `lineage_gvwifi-bp4a-userdebug`) from the github.com/gvwifi
 trees, kernel 3.10.108 (Exynos 7580), for the Samsung Galaxy View **SM-T670**.
 Every source change is a patch in `patches/<project>/`, applied by `scripts/apply-patches.sh`
-at build time. Nothing is committed upstream. Current build: 2026-09-28 (started 18:18), ROM zip
-SHA-256 `28fc8758…2c2e`, recovery tar `bce99ffe…f9ef`.
+at build time. Nothing is committed upstream. Current build: 2026-10-04 (11:47), ROM zip
+SHA-256 `49ada750…98ab`, recovery tar `b9683ce3…ba06`.
 
 ---
 
-## Kernel: `kernel/samsung/universal7580` (11 patches)
+## Kernel: `kernel/samsung/universal7580` (13 patches)
 
 | Patch | Change | Why |
 |---|---|---|
@@ -23,6 +23,8 @@ SHA-256 `28fc8758…2c2e`, recovery tar `bce99ffe…f9ef`.
 | 0009 bootwatch | New `kernel/bootwatch.c`. If `sys.boot_completed` isn't reached within 900 s, dump all tasks and warm-restart into recovery. Before boot completes, power-off/halt/reboot requests are logged and redirected to recovery | Safety net that keeps the kernel log after a failed boot (cold resets erased it) |
 | 0010 bootwatch + SELinux: recovery and charger aware | The watchdog doesn't arm in recovery (`bootmode=2` on the cmdline) or off-mode charging (`androidboot.mode=charger`). In recovery, `sel_write_enforce()` keeps SELinux permissive | Neither mode sets `sys.boot_completed`, so the watchdog would bounce recovery back into recovery and restart charging after 15 min. Recovery's policy was never written for a kernel that really enforces (zip installs need relabel/loop access) |
 | 0011 USB: reconnect after gadget rebind | `udc_bind_to_driver()` calls `usb_gadget_connect()` again (Samsung had commented it out for the legacy Android gadget, which isn't built here) | Unbinding the gadget soft-disconnects the controller, and nothing reconnected it after rebinding. So the first USB function change (entering or leaving sideload in recovery, `svc usb setFunctions` in the ROM) dropped adb until reboot, and replugging didn't help because the driver remembered "disconnected". Verified in the ROM (an MTP switch re-enumerates in about 3 s) and in recovery (from a live adb session: Apply from ADB, full sideload with status 0, adb back 4 s later without a replug, `adb reboot` instant) |
+| 0012 fscrypt: implement `FS_IOC_GET_ENCRYPTION_POLICY_EX` | `fscrypt_ioctl_get_policy_ex()` in `fs/crypto/policy.c` plus the ext4 ioctl case | The fscrypt v2 backport declared it but never implemented it, so the ioctl returned `-ENOTTY` and nothing could read back a v2 policy: TWRP Data backups lost every directory's encryption policy |
+| 0013 USB FunctionFS: drop the kiocb reference in aio cancel | `ffs_aio_cancel()` calls `aio_put_req()` | On 3.10, `kiocb_cancel()` takes an extra reference before calling the cancel callback and expects the callback to drop it (as gadgetfs' `ep_aio_cancel()` does). The backported FunctionFS callback follows the 3.15+ convention and never did, so each read adbd had pending when it stopped leaked its kiocb, and with it the endpoint file. FunctionFS never reset and every new adbd failed with "failed to write USB descriptors: No such process": `adb root`, turning USB debugging off, or any USB mode switch left USB adb offline until a reboot. Verified: `adb root` over USB reconnects |
 
 ## Device trees
 
@@ -61,6 +63,12 @@ SHA-256 `28fc8758…2c2e`, recovery tar `bce99ffe…f9ef`.
 | `lineage-sdk` 0001 | New overlayable `def_status_bar_show_battery_percent` (default 0), loaded in LineageSettingsProvider | Lets gvwifi 0008 turn on battery % by default |
 | `packages/modules/Connectivity` 0001 | `BpfNetMaps.initBpfMaps()` logs and continues on `ENOSYS` when clearing uid-owner / ingress-discard / local_net_access / local_net_blocked_uid maps | The 3.10 BPF backport can't delete from some map types. Every **restart** of system_server crashed, so one crash became a loop. On 2026-09-24 that loop corrupted `packages.xml` + its reserve copy and PackageManager **deleted all user apps and their data** |
 | `art` 0001 | `Jit::NotifyZygoteCompilationDone()` sets `kNotifiedFailure` when `fd_methods_ == -1` | No `memfd_create` before kernel 3.17, so the early return left no state and `PostZygoteFork` aborted zygote on its first fork after background boot-method compilation, every few minutes. Verified: 6 launches after 12 min uptime, 0 aborts |
+
+### `system/core`
+
+| Project / patch | Change | Why |
+|---|---|---|
+| `system/core` 0001 | libprocessgroup `KillProcessGroup()` waits on `cgroup.events` in polls of at most 5 ms | Android 16 waits for `POLLPRI` on `cgroup.events` until a 2200 ms deadline. The 3.10 kernel's backported `cgroup.events` reports `populated` correctly but never raises `POLLPRI`, so every `stop` (and every process-group kill) took 2.2 s even though the process died in milliseconds. UsbDeviceManager waits only 1 s for `sys.usb.state=none`, so **MTP never turned on** ("waitForState(none) FAILED", then Failsafe back to adb). With kernel 0013: init clears adbd's cgroup in 0.5 ms and an MTP switch completes in about 0.6 s. Verified: Windows browses the tablet over MTP |
 
 ## Build tooling (`scripts/`)
 - `apply-patches.sh`: idempotent. For each project it restores every patched file to its
