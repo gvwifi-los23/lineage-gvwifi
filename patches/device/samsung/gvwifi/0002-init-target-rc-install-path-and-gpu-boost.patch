@@ -1,0 +1,40 @@
+From: gvwifi-los23 build kit
+Subject: [PATCH] gvwifi: install init.target.rc where it is imported; GPU boost
+
+1) init.target.rc was installed to $(TARGET_ROOT_OUT) (/init.target.rc) but
+   universal7580-common imports /vendor/etc/init/hw/init.target.rc, so none of
+   it ever ran (measured swappiness 60, not the intended 100). Install it to
+   $(TARGET_OUT_VENDOR_ETC)/init/hw.
+2) Mali-T720: boost to 668 MHz at 70% load. With kernel defaults
+   (420 MHz at 95%) CLIENT-composited 720p->1080p video ran the GPU at
+   266-350 MHz at 77% load and dropped frames; the T720 goes to 800 MHz.
+
+---
+diff --git a/ramdisk/Android.mk b/ramdisk/Android.mk
+index 67e983c..b7d4da3 100644
+--- a/ramdisk/Android.mk
++++ b/ramdisk/Android.mk
+@@ -7,6 +7,6 @@ LOCAL_MODULE            := init.target.rc
+ LOCAL_MODULE_TAGS       := optional
+ LOCAL_MODULE_CLASS      := ETC
+ LOCAL_SRC_FILES         := etc/init.target.rc
+-LOCAL_MODULE_PATH       := $(TARGET_ROOT_OUT)
++LOCAL_MODULE_PATH       := $(TARGET_OUT_VENDOR_ETC)/init/hw
+ include $(BUILD_PREBUILT)
+ 
+diff --git a/ramdisk/etc/init.target.rc b/ramdisk/etc/init.target.rc
+index 0eda6a2..a59f3bc 100644
+--- a/ramdisk/etc/init.target.rc
++++ b/ramdisk/etc/init.target.rc
+@@ -44,6 +44,11 @@ on fs
+     copy /efs/Battery/prev_batt_capacity_max /sys/class/power_supply/battery/batt_capacity_max
+ 
+ on property:sys.boot_completed=1
++    # GPU (Mali-T720): boost to 668 MHz at 70% load. Kernel defaults
++    # (420 MHz at 95%) leave client-composited 720p->1080p video at
++    # 266-350 MHz and dropping frames. Thermal/IPA limits still apply.
++    write /sys/devices/11400000.mali/highspeed_clock 668
++    write /sys/devices/11400000.mali/highspeed_load 70
+     # Set best cache size for internal and external storages
+     write /sys/block/mmcblk0/bdi/read_ahead_kb 128
+     write /sys/block/mmcblk1/bdi/read_ahead_kb 2048

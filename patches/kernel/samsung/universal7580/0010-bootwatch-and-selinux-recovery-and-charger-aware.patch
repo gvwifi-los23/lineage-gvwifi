@@ -1,0 +1,64 @@
+--- a/kernel/bootwatch.c
++++ b/kernel/bootwatch.c
+@@ -12,6 +12,23 @@
+ #include <linux/workqueue.h>
+ #include <linux/reboot.h>
+ #include <linux/sched.h>
++#include <linux/string.h>
++#include <linux/init.h>
++
++/*
++ * Recovery (Samsung bootloader passes bootmode=2) and off-mode charging
++ * (androidboot.mode=charger) never set sys.boot_completed, so the watchdog
++ * must not arm there. Recovery also keeps SELinux permissive (see selinuxfs).
++ */
++bool bootwatch_is_recovery(void)
++{
++	return strstr(saved_command_line, "bootmode=2") != NULL;
++}
++
++static bool bootwatch_is_charger(void)
++{
++	return strstr(saved_command_line, "androidboot.mode=charger") != NULL;
++}
+ 
+ int bootwatch_armed = 1;
+ module_param_named(armed, bootwatch_armed, int, 0664);
+@@ -29,6 +46,12 @@
+ 
+ static int __init bootwatch_init(void)
+ {
++	if (bootwatch_is_recovery() || bootwatch_is_charger()) {
++		bootwatch_armed = 0;
++		pr_info("bootwatch: %s boot, not arming\n",
++			bootwatch_is_recovery() ? "recovery" : "charger");
++		return 0;
++	}
+ 	pr_emerg("bootwatch: armed (900 s)\n");
+ 	schedule_delayed_work(&bootwatch_work, 900 * HZ);
+ 	return 0;
+--- a/security/selinux/selinuxfs.c
++++ b/security/selinux/selinuxfs.c
+@@ -38,6 +38,8 @@
+ #include "avc.h"
+ #include "avc_ss.h"
+ #include "security.h"
++
++extern bool bootwatch_is_recovery(void);
+ #include "objsec.h"
+ #include "conditional.h"
+ 
+@@ -184,6 +186,13 @@
+ 	selnl_notify_setenforce(new_value);
+ 	selinux_status_update_setenforce(new_value);
+ #else
++	/* gvwifi: recovery (bootmode=2) stays permissive; its policy is not
++	 * written for a kernel that really enforces. */
++	if (new_value && bootwatch_is_recovery()) {
++		pr_info("SELinux: recovery boot, staying permissive\n");
++		new_value = 0;
++	}
++
+ 	if (new_value != selinux_enforcing) {
+ 		length = task_has_security(current, SECURITY__SETENFORCE);
+ 		if (length)

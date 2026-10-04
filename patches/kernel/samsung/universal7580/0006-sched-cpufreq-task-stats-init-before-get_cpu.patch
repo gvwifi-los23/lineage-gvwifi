@@ -1,0 +1,30 @@
+From: gvwifi-los23 build kit
+Subject: [PATCH] sched: init cpufreq task stats before get_cpu() in sched_fork
+
+cpufreq_task_stats_init() does kzalloc(GFP_KERNEL) but was called after
+get_cpu() (preemption disabled): "BUG: sleeping function called from invalid
+context" on every fork under CONFIG_DEBUG_ATOMIC_SLEEP, and a possible
+scheduling-while-atomic hang under memory pressure. Call it first.
+
+---
+diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+index a263ba40..2553cbb7 100644
+--- a/kernel/sched/core.c
++++ b/kernel/sched/core.c
+@@ -1848,12 +1848,15 @@ void set_numabalancing_state(bool enabled)
+ void sched_fork(struct task_struct *p)
+ {
+ 	unsigned long flags;
+-	int cpu = get_cpu();
++	int cpu;
+ 
+ #ifdef CONFIG_CPU_FREQ_STAT
++	/* Allocates with GFP_KERNEL: must run before get_cpu(). */
+ 	cpufreq_task_stats_init(p);
+ #endif
+ 
++	cpu = get_cpu();
++
+ 	__sched_fork(p);
+ 	/*
+ 	 * We mark the process as running here. This guarantees that

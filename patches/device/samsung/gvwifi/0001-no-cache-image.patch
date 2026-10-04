@@ -1,0 +1,64 @@
+From: gvwifi-los23 build kit
+Subject: [PATCH] gvwifi: no cache image; supply cache_size via releasetools
+
+The CACHE partition backs /metadata (see universal7580-common patch), so:
+- drop BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE: otherwise cache.img is built and
+  add_img_to_target_files fails with KeyError /cache;
+- cache_size is then absent from misc_info, and non-A/B blockimgdiff asserts
+  on it, so releasetools.py sets it from FullOTA_Assertions().
+
+---
+diff --git a/BoardConfig.mk b/BoardConfig.mk
+index 3156826..27c7fa8 100644
+--- a/BoardConfig.mk
++++ b/BoardConfig.mk
+@@ -41,7 +41,6 @@ TARGET_USERIMAGES_USE_EXT4 := true
+ TARGET_USERIMAGES_USE_F2FS := true
+ BOARD_BOOTIMAGE_PARTITION_SIZE := 33554432
+ BOARD_CACHEIMAGE_PARTITION_SIZE := 104857600
+-BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
+ BOARD_RAMDISK_USE_XZ := true
+ BOARD_RECOVERYIMAGE_PARTITION_SIZE := 39845888
+ BOARD_SYSTEMIMAGE_PARTITION_SIZE := 3145728000
+@@ -51,6 +50,9 @@ BOARD_FLASH_BLOCK_SIZE := 4096
+ # Kernel
+ TARGET_KERNEL_CONFIG := lineageos_gvwifi_defconfig
+ 
++# Releasetools
++TARGET_RELEASETOOLS_EXTENSIONS := $(LOCAL_PATH)
++
+ # Recovery
+ TARGET_RECOVERY_DEFAULT_ROTATION := ROTATION_DOWN
+ TARGET_RECOVERY_PIXEL_FORMAT := ABGR_8888
+diff --git a/releasetools.py b/releasetools.py
+new file mode 100644
+index 0000000..300e5e6
+--- /dev/null
++++ b/releasetools.py
+@@ -0,0 +1,26 @@
++#
++# Copyright (C) 2026 The LineageOS Project
++#
++# SPDX-License-Identifier: Apache-2.0
++#
++
++import common
++
++# The CACHE partition backs /metadata on this device, so no cache image is
++# built and misc_info.txt has no cache_size. Non-A/B blockimgdiff still
++# asserts on it (it caps stash size; full OTAs do not stash), so supply the
++# partition size before GetBlockDifferences() runs.
++CACHE_SIZE = 104857600
++
++
++def _ensure_cache_size():
++  if common.OPTIONS.cache_size is None:
++    common.OPTIONS.cache_size = CACHE_SIZE
++
++
++def FullOTA_Assertions(info):
++  _ensure_cache_size()
++
++
++def IncrementalOTA_Assertions(info):
++  _ensure_cache_size()

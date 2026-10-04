@@ -1,0 +1,20 @@
+From: gvwifi-los23 build kit
+Subject: [PATCH] configfs: lockdep: use i_mutex (3.10 has no i_rwsem)
+
+The backported configfs sets the inode lock class on inode->i_rwsem, which
+only exists since Linux 4.7. Under CONFIG_LOCKDEP this fails to build.
+
+---
+diff --git a/fs/configfs/inode.c b/fs/configfs/inode.c
+index ad718e5e..ff74a930 100644
+--- a/fs/configfs/inode.c
++++ b/fs/configfs/inode.c
+@@ -156,7 +156,7 @@ static void configfs_set_inode_lock_class(struct configfs_dirent *sd,
+ 
+ 	if (depth > 0) {
+ 		if (depth <= ARRAY_SIZE(default_group_class)) {
+-			lockdep_set_class(&inode->i_rwsem,
++			lockdep_set_class(&inode->i_mutex,
+ 					  &default_group_class[depth - 1]);
+ 		} else {
+ 			/*

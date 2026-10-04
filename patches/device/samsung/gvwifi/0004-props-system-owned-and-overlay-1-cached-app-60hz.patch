@@ -1,0 +1,37 @@
+From: gvwifi-los23 build kit
+Subject: [PATCH] gvwifi: system-owned wm prop; 1 cached app; 60 Hz peak refresh
+
+---
+diff --git a/overlay/frameworks/base/core/res/res/values/config.xml b/overlay/frameworks/base/core/res/res/values/config.xml
+index 2b6b48c..76f58fc 100644
+--- a/overlay/frameworks/base/core/res/res/values/config.xml
++++ b/overlay/frameworks/base/core/res/res/values/config.xml
+@@ -178,7 +178,7 @@
+     <bool name="config_enableBurnInProtection">false</bool>
+ 
+     <!-- Low-RAM optimizations: limit cached/background processes -->
+-    <integer name="config_customizedMaxCachedProcesses">16</integer>
++    <integer name="config_customizedMaxCachedProcesses">1</integer>
+ 
+     <bool name="config_supportsMultiWindow">false</bool>
+     <bool name="config_freeformWindowManagement">false</bool>
+@@ -188,4 +188,6 @@
+      <!-- Whether WM DisplayContent supports high performance transitions
+          (lower-end devices may want to disable) -->
+     <bool name="config_deviceSupportsHighPerfTransitions">false</bool>
++    <!-- 60 Hz panel: default peak refresh rate -->
++    <integer name="config_defaultPeakRefreshRate">60</integer>
+ </resources>
+diff --git a/system_prop.mk b/system_prop.mk
+index 41ff991..2542047 100644
+--- a/system_prop.mk
++++ b/system_prop.mk
+@@ -95,7 +95,7 @@ PRODUCT_VENDOR_PROPERTIES += \
+ #    ro.ril.force_eri_from_xml=true
+ 
+ # Multitasking / Windowing optimizations
+-PRODUCT_PROPERTY_OVERRIDES += \
++PRODUCT_SYSTEM_PROPERTIES += \
+     persist.wm.debug.desktop_experience_devopts=0
+ 
+ # ADB / Debugging (Product Properties - Overrides System)

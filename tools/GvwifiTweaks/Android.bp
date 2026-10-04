@@ -1,0 +1,14 @@
+// gvwifi Tweaks: the ROM's optional setup screen (tuning for upgraded installs,
+// microG permissions, unused system apps). Shipped in the ROM via device.mk
+// PRODUCT_PACKAGES; `m GvwifiTweaks` also builds the standalone APK for upgraders.
+// Signed with the ROM's platform key, so it only gets its permissions on this ROM.
+android_app {
+    name: "GvwifiTweaks",
+    srcs: ["src/**/*.java"],
+    manifest: "AndroidManifest.xml",
+    platform_apis: true,
+    certificate: "platform",
+    optimize: {
+        enabled: false,
+    },
+}

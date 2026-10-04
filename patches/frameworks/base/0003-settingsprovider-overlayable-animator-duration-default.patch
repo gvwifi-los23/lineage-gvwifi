@@ -1,0 +1,21 @@
+--- a/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
++++ b/packages/SettingsProvider/src/com/android/providers/settings/DatabaseHelper.java
+@@ -2328,6 +2328,8 @@
+                     AudioManager.RINGER_MODE_NORMAL);
+ 
+             loadDefaultAnimationSettings(stmt);
++            loadFractionSetting(stmt, Settings.Global.ANIMATOR_DURATION_SCALE,
++                    R.fraction.def_animator_duration_scale, 1);
+ 
+             // --- Previously in 'secure'
+             loadBooleanSetting(stmt, Settings.Global.WIFI_ON,
+--- a/packages/SettingsProvider/res/values/defaults.xml
++++ b/packages/SettingsProvider/res/values/defaults.xml
+@@ -36,6 +36,7 @@
+     <bool name="def_screen_brightness_automatic_mode">false</bool>
+     <fraction name="def_window_animation_scale">100%</fraction>
+     <fraction name="def_window_transition_scale">100%</fraction>
++    <fraction name="def_animator_duration_scale">100%</fraction>
+     <bool name="def_haptic_feedback">true</bool>
+ 
+     <bool name="def_bluetooth_on">true</bool>

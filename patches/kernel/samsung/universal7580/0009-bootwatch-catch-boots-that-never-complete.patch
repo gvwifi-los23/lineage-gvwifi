@@ -1,0 +1,84 @@
+diff --git a/kernel/sys.c b/kernel/sys.c
+index 40590277..bf962847 100644
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -9,6 +9,7 @@
+ #include <linux/utsname.h>
+ #include <linux/mman.h>
+ #include <linux/reboot.h>
++extern int bootwatch_armed;
+ #include <linux/prctl.h>
+ #include <linux/highuid.h>
+ #include <linux/fs.h>
+@@ -530,6 +531,19 @@ SYSCALL_DEFINE4(reboot, int, magic1, int, magic2, unsigned int, cmd,
+ 	                magic2 != LINUX_REBOOT_MAGIC2C))
+ 		return -EINVAL;
+ 
++	if (bootwatch_armed && (cmd == LINUX_REBOOT_CMD_POWER_OFF ||
++	    cmd == LINUX_REBOOT_CMD_HALT || cmd == LINUX_REBOOT_CMD_RESTART ||
++	    cmd == LINUX_REBOOT_CMD_RESTART2)) {
++		char b[64] = "";
++		if (cmd == LINUX_REBOOT_CMD_RESTART2 &&
++		    strncpy_from_user(b, arg, sizeof(b) - 1) < 0)
++			b[0] = '\0';
++		b[sizeof(b) - 1] = '\0';
++		pr_emerg("bootwatch: reboot(cmd=0x%x, arg=\"%s\") by %s[%d] before boot completed -> recovery\n",
++			 cmd, b, current->comm, task_pid_nr(current));
++		kernel_restart("recovery");
++	}
++
+ 	/*
+ 	 * If pid namespaces are enabled and the current task is in a child
+ 	 * pid_namespace, the command is handled by reboot_pid_ns() which will
+diff --git a/kernel/Makefile b/kernel/Makefile
+index 19708129..5fa43b58 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -2,7 +2,7 @@
+ # Makefile for the linux kernel.
+ #
+ 
+-obj-y     = fork.o exec_domain.o panic.o printk.o \
++obj-y     = bootwatch.o fork.o exec_domain.o panic.o printk.o \
+ 	    cpu.o exit.o itimer.o time.o softirq.o resource.o \
+ 	    sysctl.o sysctl_binary.o capability.o ptrace.o timer.o user.o \
+ 	    signal.o sys.o kmod.o workqueue.o pid.o task_work.o \
+--- /dev/null
++++ b/kernel/bootwatch.c
+@@ -0,0 +1,36 @@
++/*
++ * DEBUG ONLY: catch a boot that never completes.
++ * - 900 s after boot, if still armed: dump all tasks and warm-restart into
++ *   recovery (RAM console survives, readable as /proc/last_kmsg).
++ * - While armed, power-off/halt/reboot requests are logged and redirected to
++ *   a warm restart into recovery.
++ * init disarms it on sys.boot_completed via
++ *   /sys/module/bootwatch/parameters/armed
++ */
++#include <linux/module.h>
++#include <linux/moduleparam.h>
++#include <linux/workqueue.h>
++#include <linux/reboot.h>
++#include <linux/sched.h>
++
++int bootwatch_armed = 1;
++module_param_named(armed, bootwatch_armed, int, 0664);
++
++static void bootwatch_fn(struct work_struct *work)
++{
++	if (!bootwatch_armed)
++		return;
++	pr_emerg("bootwatch: boot not completed after 900 s; dumping tasks\n");
++	show_state_filter(0);
++	pr_emerg("bootwatch: restarting into recovery\n");
++	kernel_restart("recovery");
++}
++static DECLARE_DELAYED_WORK(bootwatch_work, bootwatch_fn);
++
++static int __init bootwatch_init(void)
++{
++	pr_emerg("bootwatch: armed (900 s)\n");
++	schedule_delayed_work(&bootwatch_work, 900 * HZ);
++	return 0;
++}
++late_initcall(bootwatch_init);

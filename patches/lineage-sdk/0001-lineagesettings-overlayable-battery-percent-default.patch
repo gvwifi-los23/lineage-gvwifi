@@ -1,0 +1,24 @@
+--- a/packages/LineageSettingsProvider/res/values/defaults.xml
++++ b/packages/LineageSettingsProvider/res/values/defaults.xml
+@@ -31,6 +31,9 @@
+          2. Left -->
+     <integer name="def_qs_quick_pulldown">0</integer>
+ 
++    <!-- Default for LineageSettings.System.STATUS_BAR_SHOW_BATTERY_PERCENT (0 = hidden) -->
++    <integer name="def_status_bar_show_battery_percent">0</integer>
++
+     <!-- Default value for the battery LEDs brightness -->
+     <integer name="def_battery_brightness_level">255</integer>
+ 
+--- a/packages/LineageSettingsProvider/src/org/lineageos/lineagesettings/LineageDatabaseHelper.java
++++ b/packages/LineageSettingsProvider/src/org/lineageos/lineagesettings/LineageDatabaseHelper.java
+@@ -461,6 +461,9 @@
+             loadIntegerSetting(stmt, LineageSettings.System.STATUS_BAR_QUICK_QS_PULLDOWN,
+                     R.integer.def_qs_quick_pulldown);
+ 
++            loadIntegerSetting(stmt, LineageSettings.System.STATUS_BAR_SHOW_BATTERY_PERCENT,
++                    R.integer.def_status_bar_show_battery_percent);
++
+             loadIntegerSetting(stmt, LineageSettings.System.BATTERY_LIGHT_BRIGHTNESS_LEVEL,
+                     R.integer.def_battery_brightness_level);
+ 

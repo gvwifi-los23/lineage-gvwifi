@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  LineageOS 23.2 (Android 16) for Samsung Galaxy View SM-T670 (gvwifi)
+
+  Sources: github.com/gvwifi (LineageOS 23.2 bringup, March 2026).
+  That account publishes no manifest, so this one was reconstructed from the
+  trees' makefiles. gvwifi/* repos are pinned to the commits reviewed on
+  2026-09-23 (upstream= keeps `repo` aware of the branch). To follow the
+  author's latest work instead, delete the revision= attributes.
+-->
+<manifest>
+
+  <!-- Device + common trees -->
+  <project path="device/samsung/gvwifi"
+           name="gvwifi/android_device_samsung_gvwifi" remote="github"
+           revision="e0de20bf572362c426a29e4788798b14cf51c539" upstream="lineage-23.2" />
+  <project path="device/samsung/universal7580-common"
+           name="gvwifi/android_device_samsung_universal7580-common" remote="github"
+           revision="cf868df85d34aa9290adfe04500ebe39c82f0b31" upstream="lineage-23.2" />
+
+  <!-- Kernel: Linux 3.10.108 with Android 16 BPF/BTF/mm backports -->
+  <project path="kernel/samsung/universal7580"
+           name="gvwifi/android_kernel_samsung_universal7580" remote="github"
+           revision="09ffce033980e53b17547774ebeb9a862a74744e" upstream="lineage-23.2"
+           clone-depth="1" />
+
+  <!-- Proprietary blobs -->
+  <project path="vendor/samsung/gvwifi"
+           name="gvwifi/android_vendor_samsung_gvwifi" remote="github"
+           revision="dd6641b8dbca9409b4e326a0b9942eb24c67a44e" upstream="lineage-23.2" />
+  <project path="vendor/samsung/universal7580-common"
+           name="gvwifi/android_vendor_samsung_universal7580-common" remote="github"
+           revision="c69bb2c63e6f4b5a135b6b768d31ae1dfdf94e28" upstream="lineage-23.2" />
+
+  <!-- Samsung SLSI hardware (LineageOS stopped at 18.1; these are the only 23.2 ports) -->
+  <project path="hardware/samsung_slsi/exynos"
+           name="gvwifi/android_hardware_samsung_slsi_exynos" remote="github"
+           revision="0dab0aa31cb143fa514cd3890a55239eefd971e9" upstream="lineage-23.2" />
+  <project path="hardware/samsung_slsi/exynos5"
+           name="gvwifi/android_hardware_samsung_slsi_exynos5" remote="github"
+           revision="40ca8278dbb5f3c48a25f65bb5506314d2d62e89" upstream="lineage-23.2" />
+  <project path="hardware/samsung_slsi/exynos7580"
+           name="gvwifi/android_hardware_samsung_slsi_exynos7580" remote="github"
+           revision="979afb2c936d1090e02729aa34927b82ffa9f582" upstream="lineage-23.2" />
+  <project path="hardware/samsung_slsi/openmax"
+           name="gvwifi/android_hardware_samsung_slsi_openmax" remote="github"
+           revision="332f8f5c8fee8a196c3953065b5131c2e98e95bb" upstream="lineage-23.2" />
+
+  <!-- Official LineageOS Samsung HALs (not in the default manifest; not forked by gvwifi) -->
+  <project path="hardware/samsung"
+           name="LineageOS/android_hardware_samsung" remote="github" />
+
+</manifest>

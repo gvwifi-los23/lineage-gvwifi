@@ -1,0 +1,33 @@
+--- a/overlay/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
++++ b/overlay/frameworks/base/packages/SettingsProvider/res/values/defaults.xml
+@@ -18,4 +18,9 @@
+ -->
+ <resources>
+     <bool name="def_screen_brightness_automatic_mode">true</bool>
++
++    <!-- gvwifi: 0.5x animations feel much faster on this 2015 SoC -->
++    <fraction name="def_window_animation_scale">50%</fraction>
++    <fraction name="def_window_transition_scale">50%</fraction>
++    <fraction name="def_animator_duration_scale">50%</fraction>
+ </resources>
+--- /dev/null
++++ b/overlay/lineage-sdk/packages/LineageSettingsProvider/res/values/defaults.xml
+@@ -0,0 +1,5 @@
++<?xml version="1.0" encoding="utf-8"?>
++<resources>
++    <!-- gvwifi: show the battery percentage next to the icon -->
++    <integer name="def_status_bar_show_battery_percent">2</integer>
++</resources>
+--- a/device.mk
++++ b/device.mk
+@@ -112,3 +112,10 @@
+ 
+ # Call the proprietary setup
+ $(call inherit-product, vendor/samsung/gvwifi/gvwifi-vendor.mk)
++
++# gvwifi: compile the always-used UI apps fully at build time (was a post-install step)
++PRODUCT_DEXPREOPT_SPEED_APPS += \
++    Launcher3QuickStep \
++    SystemUI \
++    Settings \
++    LatinIME

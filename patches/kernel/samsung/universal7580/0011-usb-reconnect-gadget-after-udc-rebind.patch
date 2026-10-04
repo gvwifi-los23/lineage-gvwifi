@@ -1,0 +1,16 @@
+--- a/drivers/usb/gadget/udc-core.c
++++ b/drivers/usb/gadget/udc-core.c
+@@ -357,8 +357,12 @@
+ 	 * the call to usb_gadget_connect bellow to avoid enabling the
+ 	 * pullup before userspace is ready.
+ 	 *
+-	 * usb_gadget_connect(udc->gadget);
++	 * gvwifi: this kernel has no Android gadget driver (CONFIG_USB_G_ANDROID
++	 * is off); the configfs gadget relies on the core to reconnect. Without
++	 * this, every UDC unbind/rebind (recovery sideload, USB mode switches)
++	 * leaves the controller soft-disconnected until reboot.
+ 	 */
++	usb_gadget_connect(udc->gadget);
+ 
+ 	kobject_uevent(&udc->dev.kobj, KOBJ_CHANGE);
+ 	return 0;

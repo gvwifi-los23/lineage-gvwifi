@@ -1,0 +1,60 @@
+--- a/fs/crypto/policy.c
++++ b/fs/crypto/policy.c
+@@ -348,6 +348,45 @@
+ }
+ EXPORT_SYMBOL(fscrypt_ioctl_get_policy);
+ 
++/*
++ * Extended ioctl version; can get policies of any version.
++ *
++ * gvwifi: declared in include/linux/fscrypt.h by the fscrypt v2 backport but never
++ * implemented, so FS_IOC_GET_ENCRYPTION_POLICY_EX returned -ENOTTY and nothing could
++ * read back a v2 policy (TWRP backups of /data lost every directory's policy).
++ * Same as upstream (Linux 5.4).
++ */
++int fscrypt_ioctl_get_policy_ex(struct file *filp, void __user *uarg)
++{
++	struct fscrypt_get_policy_ex_arg arg;
++	union fscrypt_policy *policy = (union fscrypt_policy *)&arg.policy;
++	size_t policy_size;
++	int err;
++
++	/* arg is policy_size, then policy */
++	BUILD_BUG_ON(offsetof(typeof(arg), policy_size) != 0);
++	BUILD_BUG_ON(offsetofend(typeof(arg), policy_size) !=
++		     offsetof(typeof(arg), policy));
++	BUILD_BUG_ON(sizeof(arg.policy) != sizeof(*policy));
++
++	err = fscrypt_get_policy(file_inode(filp), policy);
++	if (err)
++		return err;
++	policy_size = fscrypt_policy_size(policy);
++
++	if (copy_from_user(&arg, uarg, sizeof(arg.policy_size)))
++		return -EFAULT;
++
++	if (policy_size > arg.policy_size)
++		return -EOVERFLOW;
++	arg.policy_size = policy_size;
++
++	if (copy_to_user(uarg, &arg, sizeof(arg.policy_size) + policy_size))
++		return -EFAULT;
++	return 0;
++}
++EXPORT_SYMBOL_GPL(fscrypt_ioctl_get_policy_ex);
++
+ /**
+  * fscrypt_has_permitted_context() - is a file's encryption policy permitted
+  *				     within its directory?
+--- a/fs/ext4/ioctl.c
++++ b/fs/ext4/ioctl.c
+@@ -658,6 +658,9 @@
+ 	case EXT4_IOC_GET_ENCRYPTION_POLICY:
+ 		return fscrypt_ioctl_get_policy(filp, (void __user *)arg);
+ 
++	case FS_IOC_GET_ENCRYPTION_POLICY_EX:
++		return fscrypt_ioctl_get_policy_ex(filp, (void __user *)arg);
++
+ 	/* fscrypt v2 key management ioctls */
+ 	case FS_IOC_ADD_ENCRYPTION_KEY:
+ 		return fscrypt_ioctl_add_key(filp, (void __user *)arg);

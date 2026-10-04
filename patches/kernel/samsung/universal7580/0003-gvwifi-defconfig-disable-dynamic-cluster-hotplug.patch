@@ -1,0 +1,26 @@
+From: gvwifi-los23 build kit
+Subject: [PATCH] gvwifi: defconfig: disable dynamic cluster hotplug
+
+The Exynos 7580 dynamic cluster hotplug (dm_cluster_hotplug_7580) offlines
+CPUs 1-7 at idle and re-onlines them under load. Every re-online goes through
+the 23.2 bring-up's custom cpufreq "revive parked policy" path, which fails
+(cannot create duplicate cpufreq link) on each cycle; after ~40 min of this a
+boot on SM-T670 died with "Watchdog detected hard LOCKUP on cpu 0" and hung in
+panic with a blank screen. Keep all cores online and leave idle power to
+cpuidle. sec_argos users are #ifdef-guarded; the rc chown lines on the
+clusterhotplug sysfs nodes just fail harmlessly.
+
+---
+diff --git a/arch/arm64/configs/lineageos_gvwifi_defconfig b/arch/arm64/configs/lineageos_gvwifi_defconfig
+index 688019a7..9e190a9c 100644
+--- a/arch/arm64/configs/lineageos_gvwifi_defconfig
++++ b/arch/arm64/configs/lineageos_gvwifi_defconfig
+@@ -320,7 +320,7 @@ CONFIG_EXYNOS_ASV_MARGIN_TEST=y
+ # CONFIG_SKIP_HW_BREAKPOINT is not set
+ CONFIG_CAL_SYS_PWRDOWN=y
+ # CONFIG_EXYNOS7580_QUAD is not set
+-CONFIG_EXYNOS7580_DYNAMIC_CLUSTER_HOTPLUG=y
++# CONFIG_EXYNOS7580_DYNAMIC_CLUSTER_HOTPLUG is not set
+ CONFIG_EXYNOS_CONTENT_PATH_PROTECTION=y
+ CONFIG_EXYNOS5_SETUP_MIPIPHY=y
+ CONFIG_SAMSUNG_PRODUCT_SHIP=y

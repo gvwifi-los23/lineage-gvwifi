@@ -1,0 +1,91 @@
+From: gvwifi-los23 build kit
+Subject: [PATCH] universal7580: SELinux labels for A16 AIDL HALs/gpsd/odm etc, present-fence prop, vendor_init tuning, system charger props, no content-detection refresh
+
+---
+diff --git a/sepolicy/file_contexts b/sepolicy/file_contexts
+index 70dee34..a4a150f 100644
+--- a/sepolicy/file_contexts
++++ b/sepolicy/file_contexts
+@@ -180,4 +180,11 @@
+ /(vendor|system/vendor)/bin/hw/android\.hardware\.audio\.effect\.service\.universal7580    u:object_r:hal_audio_default_exec:s0
+ 
+ 
+-/vendor/bin/gpsd u:object_r:gpsd_exec:s0
++/(vendor|system/vendor)/bin/gpsd u:object_r:gpsd_exec:s0
++
++# Android 16 AIDL HALs (vendor lives in /system/vendor on this device)
++/(vendor|system/vendor)/bin/hw/android\.hardware\.health-service\.universal7580    u:object_r:hal_health_default_exec:s0
++/(vendor|system/vendor)/bin/hw/android\.hardware\.power-service\.universal7580     u:object_r:hal_power_default_exec:s0
++/(vendor|system/vendor)/bin/hw/android\.hardware\.vibrator-service\.universal7580  u:object_r:hal_vibrator_default_exec:s0
++# ODM config inside /system/vendor/odm
++/system/vendor/odm/etc(/.*)?  u:object_r:vendor_configs_file:s0
+diff --git a/sepolicy/hal_graphics_composer.te b/sepolicy/hal_graphics_composer.te
+index 23a2922..efcef17 100644
+--- a/sepolicy/hal_graphics_composer.te
++++ b/sepolicy/hal_graphics_composer.te
+@@ -14,3 +14,5 @@ allow hal_graphics_composer_default video_device:chr_file rw_file_perms;
+ allow hal_graphics_composer_default secmem_device:chr_file rw_file_perms;
+ 
+ allow hal_graphics_composer_default hal_graphics_allocator_service:service_manager find;
++
++get_prop(hal_graphics_composer_default, vendor_gvwifi_hwc_prop)
+diff --git a/sepolicy/property.te b/sepolicy/property.te
+index c13353d..69b7984 100644
+--- a/sepolicy/property.te
++++ b/sepolicy/property.te
+@@ -7,3 +7,5 @@ type sswap_prop, property_type, vendor_property_type;
+ type vendor_wifi_prop, property_type, vendor_property_type;
+ type vendor_radio_prop, property_type, vendor_property_type;
+ type tee_prop, property_type, vendor_property_type;
++
++vendor_internal_prop(vendor_gvwifi_hwc_prop)
+diff --git a/sepolicy/property_contexts b/sepolicy/property_contexts
+index bfba36f..b7fbf17 100644
+--- a/sepolicy/property_contexts
++++ b/sepolicy/property_contexts
+@@ -24,3 +24,6 @@ persist.ril.interfaceconf.failed u:object_r:vendor_radio_prop:s0
+ 
+ # sswap
+ persist.sys.swapoff     u:object_r:sswap_prop:s0
++
++# Display: HWC1 retire fences are valid present fences
++ro.vendor.hwc.present_fence_reliable u:object_r:vendor_gvwifi_hwc_prop:s0 exact bool
+diff --git a/sepolicy/system_server.te b/sepolicy/system_server.te
+index d2453ac..7ed143d 100644
+--- a/sepolicy/system_server.te
++++ b/sepolicy/system_server.te
+@@ -80,3 +80,6 @@ allow system_server sysfs_sensors:file { getattr open read };
+ 
+ # vendor files
+ allow system_server vendor_file:file { execute getattr open read };
++
++# legacy GPS HAL JNI pipe
++allow system_server gps_data_file:fifo_file create_file_perms;
+diff --git a/sepolicy/vendor_init.te b/sepolicy/vendor_init.te
+index b0851e8..c5c9459 100644
+--- a/sepolicy/vendor_init.te
++++ b/sepolicy/vendor_init.te
+@@ -20,3 +20,7 @@ allow vendor_init system_prop:property_service set;
+ allow vendor_init vold_prop:property_service set;
+ allow vendor_init wifi_data_file:dir { getattr setattr };
+ allow vendor_init wpa_socket:dir getattr;
++
++# init.target.rc low-RAM tuning
++allow vendor_init proc_vm:file w_file_perms;
++allow vendor_init proc_extra_free_kbytes:file w_file_perms;
+diff --git a/system_prop.mk b/system_prop.mk
+index b349920..20dcfb9 100644
+--- a/system_prop.mk
++++ b/system_prop.mk
+@@ -48,6 +48,10 @@ PRODUCT_PROPERTY_OVERRIDES += \
+     net.tcp.default_init_rwnd=60
+ 
+ # Charger
+-PRODUCT_PROPERTY_OVERRIDES += \
++PRODUCT_SYSTEM_PROPERTIES += \
+     ro.charger.backlight.path=/sys/class/backlight/panel/brightness \
+     ro.charger.enable_suspend=true
++
++# Don't lower the render rate for video content (60<->30 Hz churn, judder)
++PRODUCT_VENDOR_PROPERTIES += \
++    ro.surface_flinger.use_content_detection_for_refresh_rate=false

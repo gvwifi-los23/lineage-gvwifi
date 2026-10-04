@@ -1,0 +1,13 @@
+--- a/runtime/jit/jit.cc
++++ b/runtime/jit/jit.cc
+@@ -524,6 +524,10 @@
+ 
+ void Jit::NotifyZygoteCompilationDone() {
+   if (fd_methods_ == -1) {
++    // gvwifi: without memfd_create (kernel < 3.17) there is no shared methods
++    // file. Record the failure so PostZygoteFork's CHECK holds, as on every
++    // other failure path below; otherwise zygote aborts on its next fork.
++    code_cache_->GetZygoteMap()->SetCompilationState(ZygoteCompilationState::kNotifiedFailure);
+     return;
+   }
+ 

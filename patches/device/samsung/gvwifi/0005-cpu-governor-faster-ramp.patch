@@ -1,0 +1,25 @@
+From: gvwifi-los23 build kit
+Subject: [PATCH] gvwifi: interactive governor ramps up sooner (go_hispeed_load 99->80/85)
+
+---
+diff --git a/ramdisk/etc/init.target.rc b/ramdisk/etc/init.target.rc
+index a59f3bc..263e4f5 100644
+--- a/ramdisk/etc/init.target.rc
++++ b/ramdisk/etc/init.target.rc
+@@ -44,6 +44,16 @@ on fs
+     copy /efs/Battery/prev_batt_capacity_max /sys/class/power_supply/battery/batt_capacity_max
+ 
+ on property:sys.boot_completed=1
++    # CPU governor: the defaults (go_hispeed_load 99, target_loads 90) ramp up
++    # too late for touch/scroll; this power HAL has no input boost.
++    write /sys/devices/system/cpu/cpu0/cpufreq/interactive/hispeed_freq 1200000
++    write /sys/devices/system/cpu/cpu0/cpufreq/interactive/go_hispeed_load 80
++    write /sys/devices/system/cpu/cpu0/cpufreq/interactive/target_loads "75 1300000:85"
++    write /sys/devices/system/cpu/cpu0/cpufreq/interactive/above_hispeed_delay 20000
++    write /sys/devices/system/cpu/cpu4/cpufreq/interactive/hispeed_freq 1300000
++    write /sys/devices/system/cpu/cpu4/cpufreq/interactive/go_hispeed_load 85
++    write /sys/devices/system/cpu/cpu4/cpufreq/interactive/target_loads "80 1500000:90"
++    write /sys/devices/system/cpu/cpu4/cpufreq/interactive/above_hispeed_delay 20000
+     # GPU (Mali-T720): boost to 668 MHz at 70% load. Kernel defaults
+     # (420 MHz at 95%) leave client-composited 720p->1080p video at
+     # 266-350 MHz and dropping frames. Thermal/IPA limits still apply.

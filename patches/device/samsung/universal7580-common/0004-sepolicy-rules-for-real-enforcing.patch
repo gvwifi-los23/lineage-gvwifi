@@ -1,0 +1,43 @@
+--- a/sepolicy/genfs_contexts
++++ b/sepolicy/genfs_contexts
+@@ -129,3 +129,5 @@
+ 
+ # gvwifi bq24773 charger power_supply (read by the health HAL)
+ genfscon sysfs /devices/13890000.hsi2c/i2c-1/1-006a/power_supply u:object_r:sysfs_usb_supply:s0
++# gvwifi smart fuel gauge power_supply (read by the health HAL)
++genfscon sysfs /devices/13890000.hsi2c/i2c-1/1-000b/power_supply u:object_r:sysfs_batteryinfo:s0
+--- a/sepolicy/hal_health_default.te
++++ b/sepolicy/hal_health_default.te
+@@ -1,2 +1,3 @@
+ r_dir_file(hal_health_default, sysfs_usb_supply)
+ allow hal_health_default sysfs_usb_supply:file rw_file_perms;
++r_dir_file(hal_health_default, sysfs_batteryinfo)
+--- a/sepolicy/netd.te
++++ b/sepolicy/netd.te
+@@ -1,6 +1,6 @@
+ allow netd self:capability sys_module;
+-#allow netd gpsd:fd use;
++allow netd gpsd:fd use;
+ #allow netd gpsd:udp_socket rw_socket_perms;
+-#allow netd gpsd:tcp_socket rw_socket_perms;
++allow netd gpsd:tcp_socket { read write getopt setopt };
+ 
+ allow netd kernel:system module_request;
+--- a/sepolicy/ueventd.te
++++ b/sepolicy/ueventd.te
+@@ -12,3 +12,5 @@
+ 
+ # Allow access to /proc/device-tree nodes
+ r_dir_file(ueventd, proc_dt_firmware)
++
++allow ueventd self:capability sys_nice;
+--- a/sepolicy/vendor_init.te
++++ b/sepolicy/vendor_init.te
+@@ -27,3 +27,7 @@
+ 
+ # init.target.rc CPU governor tuning
+ allow vendor_init sysfs_devices_system_cpu:file w_file_perms;
++
++# init.target.rc sets ro.vendor.hwc.present_fence_reliable
++set_prop(vendor_init, vendor_gvwifi_hwc_prop)
++dontaudit vendor_init rootfs:dir read;

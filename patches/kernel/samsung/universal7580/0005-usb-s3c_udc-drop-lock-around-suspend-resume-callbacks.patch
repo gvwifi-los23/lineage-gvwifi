@@ -1,0 +1,49 @@
+From: gvwifi-los23 build kit
+Subject: [PATCH] usb: s3c_udc: drop dev->lock around gadget suspend/resume callbacks
+
+s3c_udc_irq() holds dev->lock (irqsave) and called driver->suspend/resume
+with it held. The backported composite core's composite_suspend() calls
+usb_gadget_set_selfpowered() -> s3c_set_selfpowered(), which takes dev->lock
+again: CPU0 self-deadlocks with IRQs off. Caught on SM-T670 with
+CONFIG_DEBUG_SPINLOCK:
+
+  BUG: spinlock lockup suspected on CPU#0, swapper/0/0
+   lock: .owner: swapper/0/0, .owner_cpu: 0
+   s3c_set_selfpowered <- usb_gadget_set_selfpowered <- composite_suspend
+   <- configfs_composite_suspend <- s3c_udc_irq
+  Kernel panic - not syncing: Watchdog detected hard LOCKUP on cpu 0
+
+Triggered by USB bus suspend: cable plug/unplug, or host autosuspend while
+connected. Release the lock around both callbacks, as this handler already
+does for ->disconnect and as dwc2 does upstream.
+
+---
+diff --git a/drivers/usb/gadget/udc/s3c_udc_otg_xfer_dma.c b/drivers/usb/gadget/udc/s3c_udc_otg_xfer_dma.c
+index 3e342b1d..bb952637 100644
+--- a/drivers/usb/gadget/udc/s3c_udc_otg_xfer_dma.c
++++ b/drivers/usb/gadget/udc/s3c_udc_otg_xfer_dma.c
+@@ -542,8 +542,13 @@ static irqreturn_t s3c_udc_irq(int irq, void *_dev)
+ 		if (dev->gadget.speed != USB_SPEED_UNKNOWN
+ 		    && dev->driver
+ 		    && dev->driver->suspend) {
+-
++			/* composite_suspend() calls usb_gadget_set_selfpowered()
++			 * -> s3c_set_selfpowered(), which takes dev->lock: drop it
++			 * here (as for ->disconnect below) or CPU0 self-deadlocks
++			 * in this IRQ with interrupts off (hard LOCKUP). */
++			spin_unlock(&dev->lock);
+ 			dev->driver->suspend(&dev->gadget);
++			spin_lock(&dev->lock);
+ 		}
+ 	}
+ 
+@@ -554,7 +559,9 @@ static irqreturn_t s3c_udc_irq(int irq, void *_dev)
+ 		if (dev->gadget.speed != USB_SPEED_UNKNOWN
+ 		    && dev->driver
+ 		    && dev->driver->resume) {
++			spin_unlock(&dev->lock);
+ 			dev->driver->resume(&dev->gadget);
++			spin_lock(&dev->lock);
+ 		}
+ 	}
+ 

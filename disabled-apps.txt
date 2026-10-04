@@ -1,0 +1,26 @@
+# Disabled on 2026-09-23 with: adb shell pm disable-user --user 0 <pkg>
+# Re-enable with:              adb shell pm enable <pkg>
+com.android.messaging
+com.android.stk
+com.android.simappdialog
+com.android.smspush
+com.android.DeviceAsWebcam
+com.android.dreams.basic
+com.android.dreams.phototable
+com.android.egg
+com.android.healthconnect.controller
+com.android.bips
+com.android.printservice.recommendation
+com.android.bluetoothmidiservice
+com.android.hotspot2.osulogin
+com.android.dynsystem
+com.android.managedprovisioning
+com.android.bookmarkprovider
+com.android.htmlviewer
+org.lineageos.updater
+org.lineageos.recorder
+org.lineageos.etar
+org.lineageos.camelot
+com.stevesoltys.seedvault
+org.calyxos.backup.contacts
+com.google.android.apps.googlecamera.fishfood

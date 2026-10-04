@@ -1,0 +1,22 @@
+--- a/device-common.mk
++++ b/device-common.mk
+@@ -146,6 +146,10 @@
+     android.hardware.power-service.universal7580
+ 
+ 
++# GPS data symlinks (system rc, runs as init)
++PRODUCT_COPY_FILES += \
++    $(LOCAL_PATH)/configs/init/gps-links.rc:$(TARGET_COPY_OUT_SYSTEM)/etc/init/gps-links.rc
++
+ # Permissions
+ PRODUCT_COPY_FILES += \
+     frameworks/native/data/etc/android.hardware.camera.front.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.camera.front.xml \
+--- /dev/null
++++ b/configs/init/gps-links.rc
+@@ -0,0 +1,6 @@
++# gvwifi: Samsung gpsd hardcodes /data/system/gps and /data/gps. The vendor rc
++# can't create symlinks in core /data (vendor_init is denied), so on a fresh
++# install they were missing and GPS never started. System rc files run as init.
++on post-fs-data
++    symlink /data/vendor/gps /data/system/gps
++    symlink /data/vendor/gps /data/gps

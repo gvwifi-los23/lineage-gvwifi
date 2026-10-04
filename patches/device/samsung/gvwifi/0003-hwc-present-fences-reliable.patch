@@ -1,0 +1,19 @@
+From: gvwifi-los23 build kit
+Subject: [PATCH] gvwifi: declare HWC1 retire fences reliable
+
+---
+diff --git a/system_prop.mk b/system_prop.mk
+index cf9c279..41ff991 100644
+--- a/system_prop.mk
++++ b/system_prop.mk
+@@ -102,4 +102,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
+ # PRODUCT_PRODUCT_PROPERTIES += \
+ #    ro.adb.secure=0 \
+ #    ro.secure=0 \
+-#    ro.debuggable=1
+\ No newline at end of file
++#    ro.debuggable=1
++# Display: s3c_fb/decon retire fences signal after vsync once the new frame
++# has latched, so they are valid HWC2 present fences (see hwc2on1adapter patch).
++PRODUCT_VENDOR_PROPERTIES += \
++    ro.vendor.hwc.present_fence_reliable=true

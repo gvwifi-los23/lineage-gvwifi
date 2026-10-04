@@ -1,0 +1,62 @@
+From: gvwifi-los23 build kit
+Subject: [PATCH] universal7580: /metadata on CACHE; userdata is mmcblk0p22
+
+The SM-T670 checked on 2026-09-23 (PIT without HIDDEN) has CACHE=p21 and
+USERDATA=p22. The 23.2 tree assumed a HIDDEN partition for /metadata
+(first_stage_mount: missing device => init fatal => bootloop) and labelled
+p23 as userdata. With CACHE now backing /metadata there is no /cache mount,
+so no cache image is declared either.
+
+---
+diff --git a/BoardConfigCommon.mk b/BoardConfigCommon.mk
+index 093d60d..e92daaf 100644
+--- a/BoardConfigCommon.mk
++++ b/BoardConfigCommon.mk
+@@ -87,7 +87,6 @@ TARGET_KERNEL_LLVM_BINUTILS := false
+ # Use these flags if the board has a ext4 partition larger than 2gb
+ BOARD_HAS_LARGE_FILESYSTEM := true
+ TARGET_USERIMAGES_USE_EXT4 := true
+-BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
+ 
+ # Vendor separation
+ TARGET_COPY_OUT_VENDOR := system/vendor
+diff --git a/ramdisk/etc/fstab.samsungexynos7580 b/ramdisk/etc/fstab.samsungexynos7580
+index 342fb41..679ba92 100644
+--- a/ramdisk/etc/fstab.samsungexynos7580
++++ b/ramdisk/etc/fstab.samsungexynos7580
+@@ -13,16 +13,13 @@
+ # EFS partition (device-specific data) - removed journal_async_commit
+ /dev/block/platform/13540000.dwmmc0/by-name/EFS         /efs            ext4    nosuid,nodev,noatime,noauto_da_alloc,discard,errors=panic                       wait,check
+ 
+-# Cache partition - removed journal_async_commit
+-/dev/block/platform/13540000.dwmmc0/by-name/CACHE       /cache          ext4    nosuid,nodev,noatime,noauto_da_alloc,discard,errors=panic                       wait,check,formattable
+-
+ # Data partition - removed journal_async_commit
+ /dev/block/platform/13540000.dwmmc0/by-name/USERDATA    /data           ext4    nosuid,nodev,noatime,noauto_da_alloc,discard,errors=panic                 wait,check,formattable,fileencryption=aes-256-xts:aes-256-cts:v2
+ 
+-# Metadata partition - repurposed HIDDEN partition (40MB ext4)
+-# Required for aconfig flag storage and encryption keys
+-# Note: NOT using first_stage_mount - this device has no AVB/DSU support
+-/dev/block/platform/13540000.dwmmc0/by-name/HIDDEN      /metadata       ext4    noatime,nosuid,nodev,discard                                                    wait,check,formattable,first_stage_mount
++# Metadata partition - repurposed CACHE partition (300MB ext4).
++# SM-T670 units with the PIT used here have no HIDDEN partition; Android 10+
++# does not need /cache, so CACHE (mmcblk0p21) backs /metadata instead.
++/dev/block/platform/13540000.dwmmc0/by-name/CACHE       /metadata       ext4    noatime,nosuid,nodev,discard                                                    wait,check,formattable,first_stage_mount
+ 
+ # VOLD
+ /devices/13560000.dwmmc2/mmc_host/mmc*                  auto        auto    defaults                                                                        voldmanaged=sdcard1:auto,encryptable=userdata
+diff --git a/sepolicy/file_contexts b/sepolicy/file_contexts
+index d127a0f..70dee34 100644
+--- a/sepolicy/file_contexts
++++ b/sepolicy/file_contexts
+@@ -37,8 +37,8 @@
+ /dev/block/mmcblk0p14        u:object_r:radio_block_device:s0
+ /dev/block/mmcblk0p17        u:object_r:frp_block_device:s0
+ /dev/block/mmcblk0p20        u:object_r:system_block_device:s0
+-/dev/block/mmcblk0p21        u:object_r:cache_block_device:s0
+-/dev/block/mmcblk0p23        u:object_r:userdata_block_device:s0
++/dev/block/mmcblk0p21        u:object_r:metadata_block_device:s0
++/dev/block/mmcblk0p22        u:object_r:userdata_block_device:s0
+ 
+ /dev/rfkill                  u:object_r:rfkill_device:s0
+ 

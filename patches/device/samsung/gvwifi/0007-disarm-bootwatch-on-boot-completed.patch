@@ -1,0 +1,11 @@
+--- a/ramdisk/etc/init.target.rc
++++ b/ramdisk/etc/init.target.rc
+@@ -44,6 +44,8 @@
+     copy /efs/Battery/prev_batt_capacity_max /sys/class/power_supply/battery/batt_capacity_max
+ 
+ on property:sys.boot_completed=1
++    # boot completed: disarm the kernel boot watchdog (kernel 0009)
++    write /sys/module/bootwatch/parameters/armed 0
+     # INT bus floor: at 100-160 MHz the MSC scaler/DECON miss a vsync on ~10%
+     # of video frames (50 ms + 16 ms judder pairs); 267 MHz removes it.
+     write /sys/class/devfreq/17000010.bus_int/min_freq 267000

@@ -1,0 +1,31 @@
+--- a/device.mk
++++ b/device.mk
+@@ -62,6 +62,10 @@
+     $(LOCAL_PATH)/keylayout/gpio_keys.kl:system/usr/keylayout/gpio_keys.kl \
+     $(LOCAL_PATH)/keylayout/sec_touchkey.kl:system/usr/keylayout/sec_touchkey.kl
+ 
++# gvwifi Tweaks app (installed separately, platform-signed): allow its signature permissions
++PRODUCT_COPY_FILES += \
++    $(LOCAL_PATH)/configs/permissions/signature-permissions-gvwifi-tweaks.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/signature-permissions-gvwifi-tweaks.xml
++
+ # Permissions
+ PRODUCT_COPY_FILES += \
+     frameworks/native/data/etc/android.hardware.bluetooth_le.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.bluetooth_le.xml \
+diff --git a/configs/permissions/signature-permissions-gvwifi-tweaks.xml b/configs/permissions/signature-permissions-gvwifi-tweaks.xml
+new file mode 100644
+index 0000000..011c9de
+--- /dev/null
++++ b/configs/permissions/signature-permissions-gvwifi-tweaks.xml
+@@ -0,0 +1,12 @@
++<?xml version="1.0" encoding="utf-8"?>
++<!-- gvwifi Tweaks (org.gvwifi.tweaks) is a separately installed, platform-signed app.
++     Android 15+ only grants platform signature permissions to non-system apps listed here. -->
++<permissions>
++    <signature-permissions package="org.gvwifi.tweaks">
++        <permission name="android.permission.WRITE_SECURE_SETTINGS" />
++        <permission name="android.permission.WRITE_SETTINGS" />
++        <permission name="android.permission.CHANGE_COMPONENT_ENABLED_STATE" />
++        <permission name="android.permission.GRANT_RUNTIME_PERMISSIONS" />
++        <permission name="android.permission.DEVICE_POWER" />
++    </signature-permissions>
++</permissions>

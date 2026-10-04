@@ -1,0 +1,41 @@
+From: gvwifi-los23 build kit
+Subject: [PATCH] hwc2on1adapter: allow devices to declare HWC1 retire fences reliable
+
+The adapter unconditionally advertises PresentFenceIsNotReliable, which makes
+SurfaceFlinger keep HW vsync enabled forever. On the SM-T670 (Exynos 7580,
+s3c_fb/decon) the retire fence is signaled only after vsync once the shadow
+registers latched the new frame, i.e. a correct present fence. Measured
+before: SurfaceFlinger ~64% CPU during 1080p video with HW vsync always on.
+Opt-in via ro.vendor.hwc.present_fence_reliable=true; default unchanged.
+
+---
+diff --git a/graphics/composer/2.1/utils/hwc2on1adapter/HWC2On1Adapter.cpp b/graphics/composer/2.1/utils/hwc2on1adapter/HWC2On1Adapter.cpp
+index f14cbc7..49b9f8b 100644
+--- a/graphics/composer/2.1/utils/hwc2on1adapter/HWC2On1Adapter.cpp
++++ b/graphics/composer/2.1/utils/hwc2on1adapter/HWC2On1Adapter.cpp
+@@ -32,6 +32,7 @@
+ #include <sstream>
+ #include <type_traits>
+ 
++#include <cutils/properties.h>
+ #include <hardware/hwcomposer.h>
+ #include <log/log.h>
+ #include <utils/Trace.h>
+@@ -2270,8 +2271,15 @@ void HWC2On1Adapter::populateCapabilities() {
+ 
+     // Some devices might have HWC1 retire fences that accurately emulate
+     // HWC2 present fences when they are deferred, but it's not very reliable.
+-    // To be safe, we indicate PresentFenceIsNotReliable for all HWC1 devices.
+-    mCapabilities.insert(Capability::PresentFenceIsNotReliable);
++    // To be safe, we indicate PresentFenceIsNotReliable for all HWC1 devices,
++    // unless the device declares that its retire fences are signaled at the
++    // vsync where the frame starts scanning out (e.g. Exynos s3c_fb/decon,
++    // which signals only after the shadow registers have latched).
++    if (property_get_bool("ro.vendor.hwc.present_fence_reliable", false)) {
++        ALOGI("HWC1 retire fences declared reliable; exposing present fences");
++    } else {
++        mCapabilities.insert(Capability::PresentFenceIsNotReliable);
++    }
+ }
+ 
+ HWC2On1Adapter::Display* HWC2On1Adapter::getDisplay(hwc2_display_t id) {
