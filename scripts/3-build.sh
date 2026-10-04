@@ -5,6 +5,8 @@
 #   ./3-build.sh              full build (mka bacon)
 #   ./3-build.sh recovery     recovery only (fast first test: does it boot?)
 #   ./3-build.sh kernel       kernel/boot.img only
+#   MODULES="a b" ./3-build.sh module   only those modules (on-device testing; clean
+#                             out/ before a release build if they aren't in the ROM)
 set -eo pipefail
 source ~/.profile
 
@@ -56,11 +58,13 @@ lunch "lineage_gvwifi-${aosp_target_release}-userdebug"
 case "$TARGET" in
     recovery) goals="dtimage recoveryimage" ;;
     kernel)   goals="dtimage bootimage" ;;
+    module)   goals="${MODULES:?set MODULES}" ;;
     *)        goals="dtimage bacon recoveryimage" ;;
 esac
 # KEEP_GOING=1 builds everything that can be built, so one run surfaces
 # every failing module instead of stopping at the first.
 m -j"$JOBS" ${KEEP_GOING:+-k} $goals || { echo "BUILD FAILED ($goals)"; exit 1; }
+[ "$TARGET" = module ] && { echo "Built: $goals"; exit 0; }
 
 OUT=$(get_build_var PRODUCT_OUT)
 DIST=$HOME/gvwifi-dist/$(date +%Y%m%d-%H%M)

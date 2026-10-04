@@ -56,6 +56,8 @@ Build options: `KEEP_GOING=1` (report every failing module in one run), `CCACHE=
 | `kernel: 0012` fscrypt `FS_IOC_GET_ENCRYPTION_POLICY_EX` | declared by the fscrypt v2 backport but never implemented (`-ENOTTY`), so nothing could read back a v2 policy and TWRP Data backups lost every encryption policy |
 | `kernel: 0013` FunctionFS `ffs_aio_cancel()` drops the kiocb reference | 3.10's `kiocb_cancel()` takes an extra reference the callback must drop; the backport never did, so every adbd restart leaked the open endpoint files, FunctionFS never reset, and the next adbd failed with `ESRCH` (USB adb offline after `adb root` or any USB mode switch) |
 | `system/core: 0001` libprocessgroup: poll `cgroup.events` at most 5 ms at a time | the 3.10 backported `cgroup.events` never raises `POLLPRI`, so every `stop` waited the full 2200 ms; UsbDeviceManager gives `sys.usb.state=none` only 1 s, so **MTP never turned on**. Now adbd stops in 0.5 ms and MTP works |
+| `hardware/interfaces: 0002` USB HAL reports a fixed device-mode port | no `dual_role_usb` class on 3.10, so the HAL reported no port and Settings greyed out all USB options |
+| `3-build.sh module` (`MODULES=...`) | builds only the named modules, for on-device tests (serve a test binary from a tmpfs bind mount: `/data` is `nosuid`, which blocks the SELinux domain transition) |
 | `dtimage` added to build goals | `dt.img` is only a dependency of `bootimage`, so `m recoveryimage` failed |
 | ccache off by default | disk budget; also `~/.cache/ccache` got created as a file and broke every compile |
 

@@ -1,0 +1,29 @@
+diff --git a/usb/1.0/default/Usb.cpp b/usb/1.0/default/Usb.cpp
+index 573e0e3..0cdbbba 100644
+--- a/usb/1.0/default/Usb.cpp
++++ b/usb/1.0/default/Usb.cpp
+@@ -239,6 +239,24 @@ Status getPortModeHelper(const std::string portName, PortMode& portMode)  {
+ 
+ Status getPortStatusHelper (hidl_vec<PortStatus>& currentPortStatus) {
+     std::vector<std::string> names;
++
++    // gvwifi: kernels without the dual_role_usb class (the Galaxy View's 3.10) have no
++    // port to report, so the framework saw zero ports, the data role stayed NONE and
++    // Settings greyed out every USB option. Report the one micro-USB port as a fixed
++    // device-mode (UFP) sink that can't switch roles.
++    if (access("/sys/class/dual_role_usb", F_OK) != 0) {
++        currentPortStatus.resize(1);
++        currentPortStatus[0].portName = "otg_default";
++        currentPortStatus[0].currentDataRole = PortDataRole::DEVICE;
++        currentPortStatus[0].currentPowerRole = PortPowerRole::SINK;
++        currentPortStatus[0].currentMode = PortMode::UFP;
++        currentPortStatus[0].canChangeMode = false;
++        currentPortStatus[0].canChangeDataRole = false;
++        currentPortStatus[0].canChangePowerRole = false;
++        currentPortStatus[0].supportedModes = PortMode::UFP;
++        return Status::SUCCESS;
++    }
++
+     Status result = getTypeCPortNamesHelper(names);
+ 
+     if (result == Status::SUCCESS) {
