@@ -1,0 +1,446 @@
+diff --git a/app/build.gradle.kts b/app/build.gradle.kts
+index a32f4d5..d07af5a 100755
+--- a/app/build.gradle.kts
++++ b/app/build.gradle.kts
+@@ -19,7 +19,7 @@ android {
+         versionName = "4.1"
+         ndk {
+             abiFilters.clear()
+-            abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
++            abiFilters.addAll(listOf("armeabi-v7a"))
+         }
+         proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+     }
+diff --git a/app/src/main/assets/layouts/functional/functional_keys_galaxy_view.json b/app/src/main/assets/layouts/functional/functional_keys_galaxy_view.json
+new file mode 100644
+index 0000000..3a348ea
+--- /dev/null
++++ b/app/src/main/assets/layouts/functional/functional_keys_galaxy_view.json
+@@ -0,0 +1,120 @@
++[
++  [
++    {
++      "label": "!icon/close_history|!code/-232",
++      "type": "function",
++      "width": 0.0934
++    },
++    {
++      "type": "placeholder"
++    },
++    {
++      "label": "Del|!code/-9",
++      "type": "function",
++      "width": 0.0934
++    }
++  ],
++  [
++    {
++      "label": "Tab|!code/-10014",
++      "type": "function",
++      "width": 0.1125
++    },
++    {
++      "type": "placeholder"
++    },
++    {
++      "label": "delete",
++      "width": 0.1507
++    }
++  ],
++  [
++    {
++      "label": "Caps Lock|!code/-13",
++      "type": "function",
++      "width": 0.1375
++    },
++    {
++      "type": "placeholder"
++    },
++    {
++      "label": "action",
++      "width": 0.1257,
++      "labelFlags": 1073741824
++    }
++  ],
++  [
++    {
++      "$": "keyboard_state_selector",
++      "alphabet": {
++        "label": "Shift|!code/-11",
++        "type": "function",
++        "width": 0.1801
++      },
++      "default": {
++        "label": "shift",
++        "width": 0.1801
++      }
++    },
++    {
++      "type": "placeholder"
++    },
++    {
++      "label": "up",
++      "type": "function",
++      "width": 0.0779
++    },
++    {
++      "$": "keyboard_state_selector",
++      "alphabet": {
++        "label": "Shift|!code/-11",
++        "type": "function",
++        "width": 0.0779
++      },
++      "default": {
++        "label": "shift",
++        "width": 0.0779
++      }
++    }
++  ],
++  [
++    {
++      "label": "Ctrl|!code/-1",
++      "type": "function",
++      "width": 0.1103
++    },
++    {
++      "label": "symbol_alpha",
++      "width": 0.1103
++    },
++    {
++      "label": "emoji",
++      "width": 0.0735
++    },
++    {
++      "label": "space"
++    },
++    {
++      "$": "keyboard_state_selector",
++      "languageKeyEnabled": {
++        "label": "language_switch",
++        "width": 0.0735
++      }
++    },
++    {
++      "label": "left",
++      "type": "function",
++      "width": 0.0699
++    },
++    {
++      "label": "down",
++      "type": "function",
++      "width": 0.0699
++    },
++    {
++      "label": "right",
++      "type": "function",
++      "width": 0.0699
++    }
++  ]
++]
+diff --git a/app/src/main/assets/layouts/main/galaxy_view.json b/app/src/main/assets/layouts/main/galaxy_view.json
+new file mode 100644
+index 0000000..05de2e2
+--- /dev/null
++++ b/app/src/main/assets/layouts/main/galaxy_view.json
+@@ -0,0 +1,113 @@
++[
++  [
++    {
++      "label": "q"
++    },
++    {
++      "label": "w"
++    },
++    {
++      "label": "e"
++    },
++    {
++      "label": "r"
++    },
++    {
++      "label": "t"
++    },
++    {
++      "label": "y"
++    },
++    {
++      "label": "u"
++    },
++    {
++      "label": "i"
++    },
++    {
++      "label": "o"
++    },
++    {
++      "label": "p"
++    }
++  ],
++  [
++    {
++      "label": "a"
++    },
++    {
++      "label": "s"
++    },
++    {
++      "label": "d"
++    },
++    {
++      "label": "f"
++    },
++    {
++      "label": "g"
++    },
++    {
++      "label": "h"
++    },
++    {
++      "label": "j"
++    },
++    {
++      "label": "k"
++    },
++    {
++      "label": "l"
++    },
++    {
++      "$": "shift_state_selector",
++      "manualOrLocked": {
++        "label": "\""
++      },
++      "default": {
++        "label": "'"
++      }
++    }
++  ],
++  [
++    {
++      "label": "z"
++    },
++    {
++      "label": "x"
++    },
++    {
++      "label": "c"
++    },
++    {
++      "label": "v"
++    },
++    {
++      "label": "b"
++    },
++    {
++      "label": "n"
++    },
++    {
++      "label": "m"
++    },
++    {
++      "$": "shift_state_selector",
++      "manualOrLocked": {
++        "label": "!"
++      },
++      "default": {
++        "label": ","
++      }
++    },
++    {
++      "$": "shift_state_selector",
++      "manualOrLocked": {
++        "label": "?"
++      },
++      "default": {
++        "label": "."
++      }
++    }
++  ]
++]
+diff --git a/app/src/main/java/helium314/keyboard/keyboard/KeyboardTheme.kt b/app/src/main/java/helium314/keyboard/keyboard/KeyboardTheme.kt
+index 7bb42bd..eaae00a 100644
+--- a/app/src/main/java/helium314/keyboard/keyboard/KeyboardTheme.kt
++++ b/app/src/main/java/helium314/keyboard/keyboard/KeyboardTheme.kt
+@@ -65,7 +65,9 @@ private constructor(val themeId: Int, @JvmField val mStyleId: Int) {
+         const val THEME_PINK = "pink"
+         const val THEME_SAND = "sand"
+         const val THEME_VIOLETTE = "violette"
++        const val THEME_GALAXY_VIEW = "galaxy_view"
+         fun getAvailableDefaultColors(prefs: SharedPreferences, isNight: Boolean) = listOfNotNull(
++            THEME_GALAXY_VIEW,
+             if (!isNight) THEME_LIGHT else null, THEME_DARK,
+             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) THEME_DYNAMIC else null,
+             if (prefs.getString(Settings.PREF_THEME_STYLE, Defaults.PREF_THEME_STYLE) == STYLE_HOLO) THEME_HOLO_WHITE else null,
+@@ -312,6 +314,21 @@ private constructor(val themeId: Int, @JvmField val mStyleId: Int) {
+                     Color.BLACK,
+                     keyboardBackground = backgroundImage
+                 )
++                THEME_GALAXY_VIEW -> DefaultColors(
++                    themeStyle,
++                    hasBorders,
++                    "#00A0CE".toColorInt(), // accent: drawable_color_shift_shifted
++                    "#CFCFD6".toColorInt(), // keypad_bg_color
++                    "#FBFBFC".toColorInt(), // letter key (estimate)
++                    "#E3E4E9".toColorInt(), // option/function key (estimate)
++                    "#FBFBFC".toColorInt(), // space bar (estimate)
++                    "#000000".toColorInt(), // normalkey_labelcolor
++                    "#7F000000".toColorInt(), // normalkey_extra_labelcolor (corner hints)
++                    "#252525".toColorInt(), // suggestion text
++                    "#666666".toColorInt(), // functionkey_labelcolor
++                    keyboardBackground = backgroundImage,
++                    actionKey = "#E3E4E9".toColorInt(), // Enter is a plain option key on the stock keyboard
++                )
+                 THEME_SAND -> DefaultColors(
+                     themeStyle,
+                     hasBorders,
+diff --git a/app/src/main/java/helium314/keyboard/keyboard/internal/keyboard_parser/floris/KeyCode.kt b/app/src/main/java/helium314/keyboard/keyboard/internal/keyboard_parser/floris/KeyCode.kt
+index 4a8bc26..427c9de 100644
+--- a/app/src/main/java/helium314/keyboard/keyboard/internal/keyboard_parser/floris/KeyCode.kt
++++ b/app/src/main/java/helium314/keyboard/keyboard/internal/keyboard_parser/floris/KeyCode.kt
+@@ -31,7 +31,7 @@ object KeyCode {
+     const val FN_LOCK =                       -6
+     const val DELETE =                        -7
+     //const val DELETE_WORD =                   -8
+-    //const val FORWARD_DELETE =                -9
++    const val FORWARD_DELETE =                -9
+     //const val FORWARD_DELETE_WORD =          -10
+     const val SHIFT =                        -11
+     const val CAPS_LOCK =                    -13
+@@ -202,7 +202,7 @@ object KeyCode {
+         CLIPBOARD_SELECT_WORD, TOGGLE_INCOGNITO_MODE, TOGGLE_AUTOCORRECT, MOVE_START_OF_LINE, MOVE_END_OF_LINE,
+         MOVE_START_OF_PAGE, MOVE_END_OF_PAGE, SHIFT, CAPS_LOCK, MULTIPLE_CODE_POINTS, UNSPECIFIED, CTRL, ALT,
+         FN, CLIPBOARD_CLEAR_HISTORY, NUMPAD, IME_HIDE_UI, CTRL_LOCK, ALT_LOCK, FN_LOCK, SYSTEM_INPUT_METHOD_PICKER,
+-        TOGGLE_FLOATING_WINDOW,
++        TOGGLE_FLOATING_WINDOW, FORWARD_DELETE,
+ 
+         // heliboard only
+         SYMBOL_ALPHA, TOGGLE_ONE_HANDED_MODE, SWITCH_ONE_HANDED_MODE, SPLIT_LAYOUT, SHIFT_ENTER,
+@@ -245,6 +245,7 @@ object KeyCode {
+         MOVE_START_OF_LINE -> KeyEvent.KEYCODE_MOVE_HOME
+         MOVE_END_OF_LINE -> KeyEvent.KEYCODE_MOVE_END
+         TAB -> KeyEvent.KEYCODE_TAB
++        FORWARD_DELETE -> KeyEvent.KEYCODE_FORWARD_DEL
+         PAGE_UP -> KeyEvent.KEYCODE_PAGE_UP
+         PAGE_DOWN -> KeyEvent.KEYCODE_PAGE_DOWN
+         ESCAPE -> KeyEvent.KEYCODE_ESCAPE
+diff --git a/app/src/main/java/helium314/keyboard/latin/common/Colors.kt b/app/src/main/java/helium314/keyboard/latin/common/Colors.kt
+index e14e10b..c9a94c7 100644
+--- a/app/src/main/java/helium314/keyboard/latin/common/Colors.kt
++++ b/app/src/main/java/helium314/keyboard/latin/common/Colors.kt
+@@ -375,6 +375,7 @@ class DefaultColors (
+     private val spaceBarText: Int = keyHintText,
+     private val gesture: Int = accent,
+     private var keyboardBackground: Drawable? = null,
++    private val actionKey: Int = accent,
+ ) : Colors {
+     private val navBar: Int
+     /** brightened or darkened variant of [background], to be used if exact background color would be
+@@ -448,7 +449,7 @@ class DefaultColors (
+                 else pressedStateList(brightenOrDarken(keyBackground, true), keyBackground)
+             functionalKeyStateList = pressedStateList(brightenOrDarken(functionalKey, true), functionalKey)
+             actionKeyStateList = if (themeStyle == STYLE_HOLO) functionalKeyStateList
+-                else pressedStateList(brightenOrDarken(accent, true), accent)
++                else pressedStateList(brightenOrDarken(actionKey, true), actionKey)
+             spaceBarStateList = if (themeStyle == STYLE_HOLO) pressedStateList(spaceBar, spaceBar)
+                 else pressedStateList(brightenOrDarken(spaceBar, true), spaceBar)
+         } else {
+@@ -457,20 +458,21 @@ class DefaultColors (
+             keyStateList = pressedStateList(keyBackground, Color.TRANSPARENT)
+             functionalKeyStateList = keyStateList
+             actionKeyStateList = if (themeStyle == STYLE_HOLO) functionalKeyStateList
+-                else pressedStateList(brightenOrDarken(accent, true), accent)
++                else pressedStateList(brightenOrDarken(actionKey, true), actionKey)
+             spaceBarStateList = pressedStateList(brightenOrDarken(spaceBar, true), spaceBar)
+         }
+         keyTextFilter = colorFilter(keyText)
+         actionKeyIconColorFilter = when {
+             themeStyle == STYLE_HOLO -> keyTextFilter
+             // the white icon may not have enough contrast, and can't be adjusted by the user
+-            isBrightColor(accent) -> colorFilter(Color.DKGRAY)
++            isBrightColor(actionKey) -> colorFilter(Color.DKGRAY)
+             else -> null
+         }
+     }
+ 
+     override fun get(color: ColorType): Int = when (color) {
+-        TOOL_BAR_KEY_ENABLED_BACKGROUND, EMOJI_CATEGORY_SELECTED, ACTION_KEY_BACKGROUND,
++        ACTION_KEY_BACKGROUND -> actionKey
++        TOOL_BAR_KEY_ENABLED_BACKGROUND, EMOJI_CATEGORY_SELECTED,
+             CLIPBOARD_PIN, SHIFT_KEY_ICON -> accent
+         AUTOFILL_BACKGROUND_CHIP -> if (themeStyle == STYLE_MATERIAL && !hasKeyBorders) background else adjustedBackground
+         GESTURE_PREVIEW, POPUP_KEYS_BACKGROUND, MORE_SUGGESTIONS_BACKGROUND, KEY_PREVIEW_BACKGROUND -> adjustedBackground
+diff --git a/app/src/main/java/helium314/keyboard/latin/settings/Defaults.kt b/app/src/main/java/helium314/keyboard/latin/settings/Defaults.kt
+index 9bf0ec7..0c754f5 100644
+--- a/app/src/main/java/helium314/keyboard/latin/settings/Defaults.kt
++++ b/app/src/main/java/helium314/keyboard/latin/settings/Defaults.kt
+@@ -31,7 +31,7 @@ object Defaults {
+         LayoutType.MAIN -> "qwerty"
+         LayoutType.SYMBOLS -> "symbols"
+         LayoutType.MORE_SYMBOLS -> "symbols_shifted"
+-        LayoutType.FUNCTIONAL -> if (Settings.getInstance().isTablet) "functional_keys_tablet" else "functional_keys"
++        LayoutType.FUNCTIONAL -> "functional_keys_galaxy_view"
+         LayoutType.NUMBER -> "number"
+         LayoutType.NUMBER_ROW -> "number_row"
+         LayoutType.NUMPAD -> "numpad"
+@@ -46,11 +46,11 @@ object Defaults {
+     private const val DEFAULT_SIZE_SCALE = 1.0f // 100%
+     const val PREF_THEME_STYLE = KeyboardTheme.STYLE_MATERIAL
+     fun PREF_ICON_STYLE(prefs: SharedPreferences) = prefs.getString(Settings.PREF_THEME_STYLE, PREF_THEME_STYLE)!!
+-    const val PREF_THEME_COLORS = KeyboardTheme.THEME_LIGHT
+-    const val PREF_THEME_COLORS_NIGHT = KeyboardTheme.THEME_DARK
+-    const val PREF_THEME_KEY_BORDERS = false
++    const val PREF_THEME_COLORS = KeyboardTheme.THEME_GALAXY_VIEW
++    const val PREF_THEME_COLORS_NIGHT = KeyboardTheme.THEME_GALAXY_VIEW
++    const val PREF_THEME_KEY_BORDERS = true
+     @JvmField
+-    val PREF_THEME_DAY_NIGHT = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
++    val PREF_THEME_DAY_NIGHT = false
+     const val PREF_CUSTOM_ICON_NAMES = ""
+     const val PREF_TOOLBAR_CUSTOM_KEY_CODES = ""
+     const val PREF_AUTO_CAP = true
+@@ -136,7 +136,7 @@ object Defaults {
+     @SuppressLint("RtlHardcoded")
+     const val PREF_ONE_HANDED_GRAVITY = Gravity.LEFT
+     const val PREF_ONE_HANDED_SCALE = 1f
+-    const val PREF_SHOW_NUMBER_ROW = false
++    const val PREF_SHOW_NUMBER_ROW = true
+     const val PREF_SHOW_NUMBER_ROW_IN_SYMBOLS = true
+     const val PREF_LOCALIZED_NUMBER_ROW = true
+     const val PREF_SHOW_NUMBER_ROW_HINTS = false
+diff --git a/app/src/main/res/values/bools.xml b/app/src/main/res/values/bools.xml
+index b089f94..481b3fd 100644
+--- a/app/src/main/res/values/bools.xml
++++ b/app/src/main/res/values/bools.xml
+@@ -6,5 +6,5 @@
+ <resources>
+     <!-- Whether this input method should be used as the default for a locale. Override it
+          for supported languages. -->
+-    <bool name="im_is_default">false</bool>
++    <bool name="im_is_default">true</bool>
+ </resources>
+diff --git a/app/src/main/res/values/strings.xml b/app/src/main/res/values/strings.xml
+index 06f57fa..b2b8237 100644
+--- a/app/src/main/res/values/strings.xml
++++ b/app/src/main/res/values/strings.xml
+@@ -747,6 +747,9 @@ New dictionary:
+     <string name="theme_name_sand" tools:keep="@string/theme_name_sand">Sand</string>
+     <!-- Theme name for violette theme -->
+     <string name="theme_name_violette" tools:keep="@string/theme_name_violette">Violette</string>
++    <string name="theme_name_galaxy_view" tools:keep="@string/theme_name_galaxy_view">Galaxy View</string>
++    <string name="layout_galaxy_view" tools:keep="@string/layout_galaxy_view">Galaxy View</string>
++    <string name="layout_functional_keys_galaxy_view" tools:keep="@string/layout_functional_keys_galaxy_view">Galaxy View</string>
+     <!-- Theme name for user-defined theme -->
+     <string name="theme_name_user" tools:keep="@string/theme_name_user">User-Defined</string>
+     <!-- Theme name for user-defined theme night mode theme -->
+diff --git a/app/src/main/res/xml/method.xml b/app/src/main/res/xml/method.xml
+index cd1067b..244c025 100644
+--- a/app/src/main/res/xml/method.xml
++++ b/app/src/main/res/xml/method.xml
+@@ -27,7 +27,7 @@
+         android:imeSubtypeLocale="en_US"
+         android:languageTag="en-US"
+         android:imeSubtypeMode="keyboard"
+-        android:imeSubtypeExtraValue="TrySuppressingImeSwitcher,AsciiCapable,SupportTouchPositionCorrection,EmojiCapable"
++        android:imeSubtypeExtraValue="KeyboardLayoutSet=MAIN:galaxy_view,TrySuppressingImeSwitcher,AsciiCapable,SupportTouchPositionCorrection,EmojiCapable"
+         android:isAsciiCapable="true"
+         />
+     <subtype android:icon="@drawable/ic_ime_switcher"

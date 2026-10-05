@@ -60,6 +60,35 @@ Build options: `KEEP_GOING=1` (report every failing module in one run), `CCACHE=
 | `3-build.sh module` (`MODULES=...`) | builds only the named modules, for on-device tests (serve a test binary from a tmpfs bind mount: `/data` is `nosuid`, which blocks the SELinux domain transition) |
 | `dtimage` added to build goals | `dt.img` is only a dependency of `bootimage`, so `m recoveryimage` failed |
 | ccache off by default | disk budget; also `~/.cache/ccache` got created as a file and broke every compile |
+| `gvwifi: 0011` + `tools/HeliBoard` Galaxy View keyboard | HeliBoard v4.1 fork shipped as the default keyboard, matching the stock SM-T670 Samsung Keyboard, with word suggestions (see below) |
+| `packages/inputmethods/LatinIME: 0001` not the default IME | Android 16 enables and selects the first system IME that is `isDefault` with a system-locale subtype, so LatinIME would otherwise win. LatinIME stays installed as an alternative (Settings > Keyboard) |
+| `kernel: 0014` clear and free per-inode fscrypt/fs-verity info | the backport never cleared `i_crypt_info`/`i_verity_info` on inode reuse nor freed them on eviction: recycled inodes inherited a stale Merkle tree (silent EIO on `packages.xml`/`roles.xml`, system_server crash loop) or another file's key (data garbage after reboot) |
+| `frameworks/base: 0004` default system IME with locale-less subtypes | HeliBoard declares its languages at runtime (`method_dummy.xml` has one placeholder subtype without a locale), so it could never match the system locale and first boot fell back to LatinIME. A system IME marked `isDefault` whose XML subtypes name no language now counts as covering any locale |
+
+## Keyboard: HeliBoard, Galaxy View fork
+
+Build the APK before the ROM (`3-build.sh` stops if it is missing):
+
+```bash
+~/gvwifi-los23/tools/HeliBoard/build.sh
+```
+
+`tools/HeliBoard/patches/0001` on HeliBoard v4.1 (AOSP LatinIME engine: suggestions,
+autocorrect, built-in English dictionary, learning):
+
+- **Layout `galaxy_view`** (default for English US) + functional keys `functional_keys_galaxy_view`:
+  the stock tablet landscape layout from `SamsungIMEv2_5.apk` (`xml-sw1080dp-land`), PC-style:
+  Hide/1-0/Del, Tab/qwerty/Backspace, Caps Lock/asdf/'"/Enter, Shift/zxcv/,!/.?/Up/Shift,
+  Ctrl/?123/emoji/space/language/Left/Down/Right. Widths are Samsung's dp ratios. The functional
+  rows line up with the number row, which is on by default.
+- **Colors `Galaxy View`** (default, day and night): from the stock APK (`#CFCFD6` keypad, black
+  letters, `#666666` function labels, 50 % black corner hints, `#00A0CE` shift accent); Enter is
+  gray like the stock option keys. Key fills are estimates: Samsung's key images are Qmage (`.qmg`).
+- **Del** is a real forward delete (`KEYCODE_FORWARD_DEL`, added to HeliBoard's key codes).
+- The SM-T670 reports `config_screen_metrics` < 3, so HeliBoard's tablet check is false; the
+  Galaxy View functional keys are the default unconditionally.
+- Users can pick any other HeliBoard layout or colors in its settings.
+- Toolchain (per-user, no sudo): `~/tools/jdk-17` (Temurin), SDK `ndk;28.0.13004108`.
 
 ## First build (2026-09-23)
 

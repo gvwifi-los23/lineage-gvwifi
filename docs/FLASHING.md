@@ -46,10 +46,10 @@ partition), stop:** this build would bootloop on that unit.
 data / factory reset** > confirm.
 
 **4. Sideload the ROM.** Check the zip first:
-`certutil -hashfile 3-rom\lineage-23.2-20260928-UNOFFICIAL-gvwifi.zip SHA256`
+`certutil -hashfile 3-rom\lineage-23.2-20261005-UNOFFICIAL-gvwifi.zip SHA256`
 must be `28fc87589a14c2c128925fe30b365140026da334a3f998ca9b2d0311bee22c2e`.
 Then in recovery: *Apply update* > *Apply from ADB*, and on the PC:
-`adb sideload 3-rom\lineage-23.2-20260928-UNOFFICIAL-gvwifi.zip`
+`adb sideload 3-rom\lineage-23.2-20261005-UNOFFICIAL-gvwifi.zip`
 - The PC shows the progress stopping near **47%** with `Total xfer: 1.00x`. That's **normal**.
 - If the tablet says *Now send the package* but `adb devices` shows nothing, run
   `adb kill-server` on the PC and try again. If it still doesn't appear, choose *Reboot to
@@ -78,7 +78,8 @@ ever fails to finish, the kernel restarts into recovery after 15 minutes, with t
   signatures differ.
 - Aurora's home page may crash (Aurora bug). Use search, or open an app page from the PC:
   `adb shell am start -a android.intent.action.VIEW -d market://details?id=<package> -p com.aurora.store`
-- Updating later: sideload the new zip from recovery, no wipe needed.
+- Updating later: sideload the new zip from recovery, no wipe needed (but see below for
+  builds up to 20261004).
 - Userdebug build, signed with the maintainer's release keys (release-keys).
 
 ## Upgrading from an earlier build of this ROM
@@ -87,7 +88,8 @@ ever fails to finish, the kernel restarts into recovery after 15 minutes, with t
 above). If you skip this, the sideload still works: if the PC loses the tablet afterward,
 tap *Reboot system now*.
 
-**2. Sideload the ROM** (step 4 above, no wipe).
+**2. Sideload the ROM** (step 4 above). From 20261005 on no wipe is needed between builds, but
+builds up to 20261004 had a kernel bug (fixed by kernel 0014) that could save files with the wrong encryption key, so a **clean install (Format Data)** is recommended once when coming from them.
 
 **3. Tuning.** The performance tuning is set as a *default*, so it only takes effect on a
 fresh install. Upgraded tablets keep their old settings. Open **gvwifi Tweaks** from the app

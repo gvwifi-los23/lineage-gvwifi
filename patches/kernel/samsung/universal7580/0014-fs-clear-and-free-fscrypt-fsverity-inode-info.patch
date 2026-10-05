@@ -1,0 +1,52 @@
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index 8a598e0f..176d7b6a 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -932,6 +932,10 @@ static struct inode *ext4_alloc_inode(struct super_block *sb)
+ 	ei->i_reserved_quota = 0;
+ #endif
+ 	ei->jinode = NULL;
++#ifdef CONFIG_EXT4_FS_ENCRYPTION
++	/* gvwifi: legacy ext4 key, never set here but tested by the read path */
++	ei->i_crypt_info = NULL;
++#endif
+ 	INIT_LIST_HEAD(&ei->i_completed_io_list);
+ 	spin_lock_init(&ei->i_completed_io_lock);
+ 	ei->i_sync_tid = 0;
+@@ -1011,6 +1015,14 @@ void ext4_clear_inode(struct inode *inode)
+ 	ext4_discard_preallocations(inode);
+ 	ext4_es_remove_extent(inode, 0, EXT_MAX_BLOCKS);
+ 	ext4_es_lru_del(inode);
++	/*
++	 * gvwifi: the fscrypt/fs-verity backport never freed these on eviction.
++	 * A recycled inode then kept a stale ->i_verity_info (reads of an ordinary
++	 * file "failed verification" with a silent -EIO) or the previous file's
++	 * ->i_crypt_info (data written with the wrong key, garbage after reboot).
++	 */
++	fscrypt_put_encryption_info(inode, NULL);
++	fsverity_cleanup_inode(inode);
+ 	if (EXT4_I(inode)->jinode) {
+ 		jbd2_journal_release_jbd_inode(EXT4_JOURNAL(inode),
+ 					       EXT4_I(inode)->jinode);
+diff --git a/fs/inode.c b/fs/inode.c
+index ad2ce630..1d25ad47 100644
+--- a/fs/inode.c
++++ b/fs/inode.c
+@@ -195,6 +195,17 @@ int inode_init_always(struct super_block *sb, struct inode *inode)
+ 		mapping->backing_dev_info = bdi;
+ 	}
+ 	inode->i_private = NULL;
++	/*
++	 * gvwifi: the fscrypt/fs-verity backport added these fields but never
++	 * cleared them, so an inode reused from the slab kept the previous file's
++	 * key or Merkle tree (see ext4_clear_inode()).
++	 */
++#ifdef CONFIG_FS_ENCRYPTION
++	inode->i_crypt_info = NULL;
++#endif
++#ifdef CONFIG_FS_VERITY
++	inode->i_verity_info = NULL;
++#endif
+ 	inode->i_mapping = mapping;
+ 	INIT_HLIST_HEAD(&inode->i_dentry);	/* buggered by rcu freeing */
+ #ifdef CONFIG_FS_POSIX_ACL

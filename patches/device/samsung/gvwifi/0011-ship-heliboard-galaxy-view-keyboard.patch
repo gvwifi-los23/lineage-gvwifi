@@ -1,0 +1,37 @@
+--- a/device.mk
++++ b/device.mk
+@@ -70,6 +70,11 @@
+ PRODUCT_PACKAGES += \
+     GvwifiTweaks
+ 
++# HeliBoard, Galaxy View fork: stock SM-T670 keyboard layout + colors, word suggestions, default keyboard.
++# LatinIME stays installed as an alternative (not default; enable it in Settings > Keyboard).
++PRODUCT_PACKAGES += \
++    HeliBoard
++
+ # Permissions
+ PRODUCT_COPY_FILES += \
+     frameworks/native/data/etc/android.hardware.bluetooth_le.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.bluetooth_le.xml \
+@@ -126,4 +131,5 @@
+     Launcher3QuickStep \
+     SystemUI \
+     Settings \
+-    LatinIME
++    LatinIME \
++    HeliBoard
+diff --git a/HeliBoard/Android.bp b/HeliBoard/Android.bp
+new file mode 100644
+--- /dev/null
++++ b/HeliBoard/Android.bp
+@@ -0,0 +1,11 @@
++// HeliBoard, Galaxy View fork (gvwifi-los23 tools/HeliBoard): the Samsung SM-T670
++// stock keyboard layout and colors on HeliBoard v4.1. tools/HeliBoard/build.sh
++// builds the unsigned APK; 3-build.sh copies it here and the build signs it.
++android_app_import {
++    name: "HeliBoard",
++    apk: "HeliBoard.apk",
++    default_dev_cert: true,
++    dex_preopt: {
++        enabled: true,
++    },
++}

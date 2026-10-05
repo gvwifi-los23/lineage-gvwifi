@@ -18,6 +18,12 @@ JOBS=${JOBS:-12}
 
 "$(dirname "$0")/apply-patches.sh"
 
+# HeliBoard (Galaxy View fork) ships as a prebuilt: tools/HeliBoard/build.sh makes
+# the APK, device patch 0011 adds its android_app_import next to where it lands.
+HB_APK="$(dirname "$0")/../tools/HeliBoard/out/HeliBoard.apk"
+[ -f "$HB_APK" ] || { echo "!! $HB_APK missing: run tools/HeliBoard/build.sh first"; exit 1; }
+cp "$HB_APK" "$TOP/device/samsung/gvwifi/HeliBoard/HeliBoard.apk"
+
 # Signing. Public builds (default) sign with the owner's private release keys
 # via LineageOS inline signing (vendor/lineage-priv/keys/keys.mk ->
 # "release-keys"). PRIVATE=1 (owner build) stays on AOSP test-keys, so it keeps

@@ -1,0 +1,41 @@
+diff --git a/services/core/java/com/android/server/inputmethod/InputMethodInfoUtils.java b/services/core/java/com/android/server/inputmethod/InputMethodInfoUtils.java
+index cc07da98c..6701e2f30 100644
+--- a/services/core/java/com/android/server/inputmethod/InputMethodInfoUtils.java
++++ b/services/core/java/com/android/server/inputmethod/InputMethodInfoUtils.java
+@@ -327,10 +327,36 @@ final class InputMethodInfoUtils {
+         if (checkDefaultAttribute && !imi.isDefault(context)) {
+             return false;
+         }
++        // gvwifi: a default system IME whose XML subtypes name no language (HeliBoard declares
++        // one locale-less placeholder and adds its languages at runtime) could never match the
++        // system locale, so first boot always fell back to another keyboard. Count it as
++        // covering any locale.
++        if (checkDefaultAttribute && hasOnlyLocaleLessSubtypes(imi, requiredSubtypeMode)) {
++            return true;
++        }
+         return SubtypeUtils.containsSubtypeOf(imi, requiredLocale, checkCountry,
+                 requiredSubtypeMode);
+     }
+ 
++    private static boolean hasOnlyLocaleLessSubtypes(InputMethodInfo imi,
++            String requiredSubtypeMode) {
++        boolean modeFound = false;
++        final int count = imi.getSubtypeCount();
++        for (int i = 0; i < count; ++i) {
++            final InputMethodSubtype subtype = imi.getSubtypeAt(i);
++            if (!TextUtils.isEmpty(subtype.getLocale())
++                    || !TextUtils.isEmpty(subtype.getLanguageTag())) {
++                return false;
++            }
++            // Same mode test as SubtypeUtils.containsSubtypeOf() (SUBTYPE_MODE_ANY is null).
++            if (TextUtils.isEmpty(requiredSubtypeMode)
++                    || requiredSubtypeMode.equalsIgnoreCase(subtype.getMode())) {
++                modeFound = true;
++            }
++        }
++        return count == 0 || modeFound;
++    }
++
+     /**
+      * Marshals the given {@link InputMethodInfo} into a byte array.
+      *

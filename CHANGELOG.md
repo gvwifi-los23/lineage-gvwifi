@@ -3,12 +3,12 @@
 Base: LineageOS 23.2 (Android 16, `lineage_gvwifi-bp4a-userdebug`) from the github.com/gvwifi
 trees, kernel 3.10.108 (Exynos 7580), for the Samsung Galaxy View **SM-T670**.
 Every source change is a patch in `patches/<project>/`, applied by `scripts/apply-patches.sh`
-at build time. Nothing is committed upstream. Current build: 2026-10-04 (12:46), ROM zip
-SHA-256 `e91587fd…dd77`, recovery tar `02b555a9…3223`.
+at build time. Nothing is committed upstream. Current build: 2026-10-05 (`lineage-23.2-20261005-UNOFFICIAL-gvwifi.zip`), ROM zip
+SHA-256 `14d2dab8…0ced`, recovery tar `eef58bf9…476c`.
 
 ---
 
-## Kernel: `kernel/samsung/universal7580` (13 patches)
+## Kernel: `kernel/samsung/universal7580` (14 patches)
 
 | Patch | Change | Why |
 |---|---|---|
@@ -25,10 +25,11 @@ SHA-256 `e91587fd…dd77`, recovery tar `02b555a9…3223`.
 | 0011 USB: reconnect after gadget rebind | `udc_bind_to_driver()` calls `usb_gadget_connect()` again (Samsung had commented it out for the legacy Android gadget, which isn't built here) | Unbinding the gadget soft-disconnects the controller, and nothing reconnected it after rebinding. So the first USB function change (entering or leaving sideload in recovery, `svc usb setFunctions` in the ROM) dropped adb until reboot, and replugging didn't help because the driver remembered "disconnected". Verified in the ROM (an MTP switch re-enumerates in about 3 s) and in recovery (from a live adb session: Apply from ADB, full sideload with status 0, adb back 4 s later without a replug, `adb reboot` instant) |
 | 0012 fscrypt: implement `FS_IOC_GET_ENCRYPTION_POLICY_EX` | `fscrypt_ioctl_get_policy_ex()` in `fs/crypto/policy.c` plus the ext4 ioctl case | The fscrypt v2 backport declared it but never implemented it, so the ioctl returned `-ENOTTY` and nothing could read back a v2 policy: TWRP Data backups lost every directory's encryption policy |
 | 0013 USB FunctionFS: drop the kiocb reference in aio cancel | `ffs_aio_cancel()` calls `aio_put_req()` | On 3.10, `kiocb_cancel()` takes an extra reference before calling the cancel callback and expects the callback to drop it (as gadgetfs' `ep_aio_cancel()` does). The backported FunctionFS callback follows the 3.15+ convention and never did, so each read adbd had pending when it stopped leaked its kiocb, and with it the endpoint file. FunctionFS never reset and every new adbd failed with "failed to write USB descriptors: No such process": `adb root`, turning USB debugging off, or any USB mode switch left USB adb offline until a reboot. Verified: `adb root` over USB reconnects |
+| 0014 fs: clear and free per-inode fscrypt / fs-verity info | `inode_init_always()` sets `i_crypt_info` and `i_verity_info` to NULL; `ext4_clear_inode()` calls `fscrypt_put_encryption_info()` and `fsverity_cleanup_inode()`; `ext4_alloc_inode()` clears the legacy ext4 key | **Data integrity.** The fscrypt/fs-verity backport added both fields but never cleared or freed them, so an inode recycled from the slab kept the previous file's info. A stale `i_verity_info` (left by an evicted fs-verity APK) made reads of ordinary files fail verification with a silent EIO: after a few framework restarts `packages.xml`, `roles.xml` and `package-restrictions.xml` became unreadable and system_server crash-looped ("Failed to read roles.xml ... EIO"). A stale `i_crypt_info` means data written with another file's key, which reads back as garbage after a reboot (the likely cause of the 2026-09-24 `packages.xml` loss). Verified: 0 read errors over the whole of `/data/system`, `/data/misc(_de)`, `/data/app` after 8 framework restarts (several per scan before) |
 
 ## Device trees
 
-### `device/samsung/gvwifi` (10 patches)
+### `device/samsung/gvwifi` (11 patches)
 | Patch | Change | Why |
 |---|---|---|
 | 0001 no cache image + `releasetools.py` | No `cache.img`; releasetools supplies `cache_size` | `/cache` isn't mounted any more (see common 0001); fixed `KeyError: /cache` and the blockimgdiff assert |
@@ -41,6 +42,7 @@ SHA-256 `e91587fd…dd77`, recovery tar `02b555a9…3223`.
 | 0008 built-in tuning | SettingsProvider overlay: window/transition/animator scales 50%; LineageSettings overlay: battery % shown; `PRODUCT_DEXPREOPT_SPEED_APPS` Launcher3QuickStep, SystemUI, Settings, LatinIME | The post-install script's tuning is now the ROM default (fresh installs). Upgraded installs keep old settings; see gvwifi Tweaks |
 | 0010 ship gvwifi Tweaks | App source under `GvwifiTweaks/` and `PRODUCT_PACKAGES += GvwifiTweaks` | Every install gets the setup screen; no separate APK or PC step |
 | 0009 signature allowlist for gvwifi Tweaks | `/system/etc/permissions/signature-permissions-gvwifi-tweaks.xml` lets `org.gvwifi.tweaks` hold WRITE_SECURE_SETTINGS, WRITE_SETTINGS, CHANGE_COMPONENT_ENABLED_STATE, GRANT_RUNTIME_PERMISSIONS, DEVICE_POWER | Android 15+ denies platform signature permissions to a platform-signed app that isn't in the system image unless it is allowlisted ("not in signature permission allowlist") |
+| 0011 ship HeliBoard (Galaxy View keyboard) | `HeliBoard/Android.bp` (`android_app_import`, signed by the build) and `PRODUCT_PACKAGES += HeliBoard`; `3-build.sh` copies `tools/HeliBoard/out/HeliBoard.apk` there | The default keyboard: HeliBoard v4.1 with the stock SM-T670 Samsung Keyboard layout and colors and word suggestions (see `README`/`BUILD-KIT`, "Keyboard"). LatinIME stays installed as an alternative |
 
 ### `device/samsung/universal7580-common` (6 patches)
 | Patch | Change | Why |
@@ -62,6 +64,8 @@ SHA-256 `e91587fd…dd77`, recovery tar `02b555a9…3223`.
 | `frameworks/base` 0002 (public since 2026-09-26; was private 0001) | `ComputerEngine.isMicrogSigned()` also accepts the maintainer's Companion certificate (SHA-256 `fa7fcd26…2871`), **only for `com.android.vending`** | Lets the maintainer-built microG Companion (0.3.16-28, with Play Age Signals; shipped in `flash-kit/4-apps`) spoof the Play Store signature, so apps that query Age Signals work (without it they fail with error GA-5). It was kept private at first; made public once the ROM itself was signed with the maintainer's release keys, since users already trust that maintainer with far more (system updates). That retired the separate private build |
 | `frameworks/base` 0003 | SettingsProvider loads `def_animator_duration_scale` (new overlayable default, 100%) into Global `animator_duration_scale` | AOSP only has overlayable defaults for the window and transition scales; needed for gvwifi 0008 |
 | `lineage-sdk` 0001 | New overlayable `def_status_bar_show_battery_percent` (default 0), loaded in LineageSettingsProvider | Lets gvwifi 0008 turn on battery % by default |
+| `frameworks/base` 0004 | `InputMethodInfoUtils.isSystemImeThatHasSubtypeOf()`: a system IME marked `isDefault` whose XML subtypes name no language counts as matching the system locale | First boot picks a default keyboard only among system IMEs that are `isDefault` **and** declare a subtype for the system locale. HeliBoard declares its languages at runtime (`method_dummy.xml` has one placeholder subtype without a locale), so it never qualified and LatinIME was chosen. Only affects default system IMEs whose subtypes are all locale-less |
+| `packages/inputmethods/LatinIME` 0001 | LatinIME's `method.xml`: `isDefault="false"` | Otherwise LatinIME is also a default candidate and, having an English subtype, wins the final pick. It stays installed as an alternative (Settings > System > Keyboard) |
 | `packages/modules/Connectivity` 0001 | `BpfNetMaps.initBpfMaps()` logs and continues on `ENOSYS` when clearing uid-owner / ingress-discard / local_net_access / local_net_blocked_uid maps | The 3.10 BPF backport can't delete from some map types. Every **restart** of system_server crashed, so one crash became a loop. On 2026-09-24 that loop corrupted `packages.xml` + its reserve copy and PackageManager **deleted all user apps and their data** |
 | `art` 0001 | `Jit::NotifyZygoteCompilationDone()` sets `kNotifiedFailure` when `fd_methods_ == -1` | No `memfd_create` before kernel 3.17, so the early return left no state and `PostZygoteFork` aborted zygote on its first fork after background boot-method compilation, every few minutes. Verified: 6 launches after 12 min uptime, 0 aborts |
 

@@ -8,7 +8,7 @@ Unofficial LineageOS 23.2 for the Wi-Fi Galaxy View (Exynos 7580, Linux 3.10.108
 | Lunch | `lineage_gvwifi-bp4a-userdebug` |
 | Source | LineageOS 23.2 + [`local_manifests/gvwifi.xml`](local_manifests/gvwifi.xml) (pinned gvwifi trees) |
 | Changes | [`patches/<project path>/NNNN-*.patch`](patches), applied by [`scripts/apply-patches.sh`](scripts/apply-patches.sh) (idempotent; nothing is committed into the upstream repos) |
-| Latest build | `lineage-23.2-20261004-UNOFFICIAL-gvwifi.zip`, release-keys, security patch 2026-09-01 |
+| Latest build | `lineage-23.2-20261005-UNOFFICIAL-gvwifi.zip`, release-keys, security patch 2026-09-01 |
 
 ## Related repos
 - [`lineage-recovery-gvwifi`](https://github.com/gvwifi-los23/lineage-recovery-gvwifi): the LineageOS recovery built from this tree
@@ -18,7 +18,9 @@ Unofficial LineageOS 23.2 for the Wi-Fi Galaxy View (Exynos 7580, Linux 3.10.108
 ## Build
 1. Windows: `scripts\0-setup-wsl.ps1` (WSL Ubuntu 24.04), then in WSL `scripts/1-host-setup.sh`
 2. `scripts/2-sync.sh`: syncs LineageOS 23.2 with the local manifest (~100 GB)
-3. `scripts/3-build.sh`: applies the patches, builds ROM zip + recovery (about 2-3 h from scratch, ~80 GB output)
+3. `tools/HeliBoard/build.sh`: builds the Galaxy View keyboard APK (HeliBoard v4.1 + `tools/HeliBoard/patches`;
+   needs JDK 17 in `~/tools/jdk-17` and an Android SDK with NDK 28.0.13004108 in `~/android-sdk`)
+4. `scripts/3-build.sh`: applies the patches, builds ROM zip + recovery (about 2-3 h from scratch, ~80 GB output)
    - `3-build.sh recovery` / `3-build.sh kernel` for partial builds
    - `KEEP_GOING=1`, `CCACHE=1`, `JOBS=N`
 
@@ -34,6 +36,8 @@ without wiping data.
 
 ## Hardware notes
 - No accelerometer: the rotation tile toggles landscape/portrait (`frameworks/base` 0001).
+- Default keyboard: HeliBoard with the stock Galaxy View layout and colors (`tools/HeliBoard`);
+  the AOSP keyboard stays installed as an alternative.
 - Charging only via the 19 V barrel adapter; micro-USB is data only.
 - The bootloader (S-Boot T670UEU2APJ1) loads the whole boot/recovery image at `0x40204800` and
   copies the ramdisk to `0x42000000`: images over ~31.4 MB don't boot.
@@ -42,4 +46,5 @@ without wiping data.
 
 ## Licenses
 Each patch is licensed like the project it modifies (kernel: GPL-2.0; AOSP/LineageOS: Apache-2.0).
-The gvwifi Tweaks app (`tools/GvwifiTweaks`) is Apache-2.0.
+The gvwifi Tweaks app (`tools/GvwifiTweaks`) is Apache-2.0. The HeliBoard patches (`tools/HeliBoard`)
+are GPL-3.0, like HeliBoard.
