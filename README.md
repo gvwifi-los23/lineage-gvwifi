@@ -10,6 +10,18 @@ Unofficial LineageOS 23.2 for the Wi-Fi Galaxy View (Exynos 7580, Linux 3.10.108
 | Changes | [`patches/<project path>/NNNN-*.patch`](patches), applied by [`scripts/apply-patches.sh`](scripts/apply-patches.sh) (idempotent; nothing is committed into the upstream repos) |
 | Latest build | `lineage-23.2-20261005-UNOFFICIAL-gvwifi.zip`, release-keys, security patch 2026-09-01 |
 
+## Screenshots
+Build 20261005 on the SM-T670 (1920x1080, landscape).
+
+| | |
+|---|---|
+| ![Home screen](docs/screenshots/01-home.png) | ![About tablet](docs/screenshots/02-about-tablet.png) |
+| Home screen | About tablet |
+| ![Android version](docs/screenshots/03-android-version.png) | ![HeliBoard keyboard](docs/screenshots/04-keyboard-heliboard.png) |
+| Android 16, LineageOS 23.2, kernel 3.10.108 | Default keyboard: HeliBoard with the Galaxy View layout |
+| ![USB preferences](docs/screenshots/05-usb-preferences.png) | |
+| USB modes (MTP, PTP, MIDI, tethering) | |
+
 ## Related repos
 - [`lineage-recovery-gvwifi`](https://github.com/gvwifi-los23/lineage-recovery-gvwifi): the LineageOS recovery built from this tree
 - [`twrp-gvwifi`](https://github.com/gvwifi-los23/twrp-gvwifi): TWRP 3.7.1 (twrp-14.1) with FBE decryption for this ROM
