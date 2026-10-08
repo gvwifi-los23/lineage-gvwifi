@@ -46,10 +46,10 @@ partition), stop:** this build would bootloop on that unit.
 data / factory reset** > confirm.
 
 **4. Sideload the ROM.** Check the zip first:
-`certutil -hashfile 3-rom\lineage-23.2-20261005-UNOFFICIAL-gvwifi.zip SHA256`
+`certutil -hashfile 3-rom\lineage-23.2-20261008-UNOFFICIAL-gvwifi.zip SHA256`
 must be `28fc87589a14c2c128925fe30b365140026da334a3f998ca9b2d0311bee22c2e`.
 Then in recovery: *Apply update* > *Apply from ADB*, and on the PC:
-`adb sideload 3-rom\lineage-23.2-20261005-UNOFFICIAL-gvwifi.zip`
+`adb sideload 3-rom\lineage-23.2-20261008-UNOFFICIAL-gvwifi.zip`
 - The PC shows the progress stopping near **47%** with `Total xfer: 1.00x`. That's **normal**.
 - If the tablet says *Now send the package* but `adb devices` shows nothing, run
   `adb kill-server` on the PC and try again. If it still doesn't appear, choose *Reboot to

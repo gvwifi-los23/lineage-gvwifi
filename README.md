@@ -8,7 +8,7 @@ Unofficial LineageOS 23.2 for the Wi-Fi Galaxy View (Exynos 7580, Linux 3.10.108
 | Lunch | `lineage_gvwifi-bp4a-userdebug` |
 | Source | LineageOS 23.2 + [`local_manifests/gvwifi.xml`](local_manifests/gvwifi.xml) (pinned gvwifi trees) |
 | Changes | [`patches/<project path>/NNNN-*.patch`](patches), applied by [`scripts/apply-patches.sh`](scripts/apply-patches.sh) (idempotent; nothing is committed into the upstream repos) |
-| Latest build | `lineage-23.2-20261005-UNOFFICIAL-gvwifi.zip`, release-keys, security patch 2026-09-01 |
+| Latest build | `lineage-23.2-20261008-UNOFFICIAL-gvwifi.zip`, release-keys, security patch 2026-09-01 |
 
 ## Screenshots
 Build 20261005 on the SM-T670 (1920x1080, landscape).

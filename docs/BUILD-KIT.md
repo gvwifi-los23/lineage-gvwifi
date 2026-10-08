@@ -77,14 +77,17 @@ Build the APK before the ROM (`3-build.sh` stops if it is missing):
 autocorrect, built-in English dictionary, learning):
 
 - **Layout `galaxy_view`** (default for English US) + functional keys `functional_keys_galaxy_view`:
-  the stock tablet landscape layout from `SamsungIMEv2_5.apk` (`xml-sw1080dp-land`), PC-style:
-  Hide/1-0/Del, Tab/qwerty/Backspace, Caps Lock/asdf/'"/Enter, Shift/zxcv/,!/.?/Up/Shift,
-  Ctrl/?123/emoji/space/language/Left/Down/Right. Widths are Samsung's dp ratios. The functional
-  rows line up with the number row, which is on by default.
+  the stock Samsung Keyboard in landscape, with its **numeric keypad on the right**:
+  Tab/qwerty/Backspace | 7 8 9 /, Caps Lock/asdf/'"/Enter | 4 5 6 *, Shift/zxcv/,!/.?/Up/Shift
+  | 1 2 3 -, Ctrl/?123/settings/space/Left/Down/Right | . 0 Enter +. Key widths and the side
+  margins were measured from a stock screenshot (1920 px): every row sums to 100%, letter keys
+  have explicit widths (5.6%), and landscape side padding defaults to 0.92 x 8% (~142 px). The
+  number row is off by default (the keypad replaces it) and so are key hints, as on stock.
 - **Colors `Galaxy View`** (default, day and night): from the stock APK (`#CFCFD6` keypad, black
-  letters, `#666666` function labels, 50 % black corner hints, `#00A0CE` shift accent); Enter is
+  letters, `#666666` function labels, `#00A0CE` shift accent); Enter is
   gray like the stock option keys. Key fills are estimates: Samsung's key images are Qmage (`.qmg`).
-- **Del** is a real forward delete (`KEYCODE_FORWARD_DEL`, added to HeliBoard's key codes).
+- A forward-delete key code (`KEYCODE_FORWARD_DEL`) is added to HeliBoard's key codes for custom
+  layouts; the default layout has no Del or Hide key (hide with the navigation bar's keyboard button).
 - The SM-T670 reports `config_screen_metrics` < 3, so HeliBoard's tablet check is false; the
   Galaxy View functional keys are the default unconditionally.
 - Users can pick any other HeliBoard layout or colors in its settings.

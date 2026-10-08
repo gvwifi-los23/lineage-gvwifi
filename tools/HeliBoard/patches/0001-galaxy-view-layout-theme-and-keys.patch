@@ -13,53 +13,85 @@ index a32f4d5..d07af5a 100755
      }
 diff --git a/app/src/main/assets/layouts/functional/functional_keys_galaxy_view.json b/app/src/main/assets/layouts/functional/functional_keys_galaxy_view.json
 new file mode 100644
-index 0000000..3a348ea
+index 0000000..647f1d1
 --- /dev/null
 +++ b/app/src/main/assets/layouts/functional/functional_keys_galaxy_view.json
-@@ -0,0 +1,120 @@
+@@ -0,0 +1,200 @@
 +[
-+  [
-+    {
-+      "label": "!icon/close_history|!code/-232",
-+      "type": "function",
-+      "width": 0.0934
-+    },
-+    {
-+      "type": "placeholder"
-+    },
-+    {
-+      "label": "Del|!code/-9",
-+      "type": "function",
-+      "width": 0.0934
-+    }
-+  ],
 +  [
 +    {
 +      "label": "Tab|!code/-10014",
 +      "type": "function",
-+      "width": 0.1125
++      "width": 0.0846
 +    },
 +    {
 +      "type": "placeholder"
 +    },
 +    {
 +      "label": "delete",
-+      "width": 0.1507
++      "width": 0.1088
++    },
++    {
++      "type": "placeholder",
++      "width": 0.0266
++    },
++    {
++      "label": "7",
++      "type": "numeric",
++      "width": 0.055
++    },
++    {
++      "label": "8",
++      "type": "numeric",
++      "width": 0.055
++    },
++    {
++      "label": "9",
++      "type": "numeric",
++      "width": 0.055
++    },
++    {
++      "label": "/",
++      "type": "function",
++      "width": 0.055
 +    }
 +  ],
 +  [
 +    {
 +      "label": "Caps Lock|!code/-13",
 +      "type": "function",
-+      "width": 0.1375
++      "width": 0.1004
 +    },
 +    {
 +      "type": "placeholder"
 +    },
 +    {
 +      "label": "action",
-+      "width": 0.1257,
-+      "labelFlags": 1073741824
++      "width": 0.0931
++    },
++    {
++      "type": "placeholder",
++      "width": 0.0266
++    },
++    {
++      "label": "4",
++      "type": "numeric",
++      "width": 0.055
++    },
++    {
++      "label": "5",
++      "type": "numeric",
++      "width": 0.055
++    },
++    {
++      "label": "6",
++      "type": "numeric",
++      "width": 0.055
++    },
++    {
++      "label": "*",
++      "type": "function",
++      "width": 0.055
 +    }
 +  ],
 +  [
@@ -68,11 +100,11 @@ index 0000000..3a348ea
 +      "alphabet": {
 +        "label": "Shift|!code/-11",
 +        "type": "function",
-+        "width": 0.1801
++        "width": 0.1276
 +      },
 +      "default": {
 +        "label": "shift",
-+        "width": 0.1801
++        "width": 0.1276
 +      }
 +    },
 +    {
@@ -81,34 +113,59 @@ index 0000000..3a348ea
 +    {
 +      "label": "up",
 +      "type": "function",
-+      "width": 0.0779
++      "width": 0.0629
 +    },
 +    {
 +      "$": "keyboard_state_selector",
 +      "alphabet": {
 +        "label": "Shift|!code/-11",
 +        "type": "function",
-+        "width": 0.0779
++        "width": 0.058
 +      },
 +      "default": {
 +        "label": "shift",
-+        "width": 0.0779
++        "width": 0.058
 +      }
++    },
++    {
++      "type": "placeholder",
++      "width": 0.0266
++    },
++    {
++      "label": "1",
++      "type": "numeric",
++      "width": 0.055
++    },
++    {
++      "label": "2",
++      "type": "numeric",
++      "width": 0.055
++    },
++    {
++      "label": "3",
++      "type": "numeric",
++      "width": 0.055
++    },
++    {
++      "label": "-",
++      "type": "function",
++      "width": 0.055
 +    }
 +  ],
 +  [
 +    {
 +      "label": "Ctrl|!code/-1",
 +      "type": "function",
-+      "width": 0.1103
++      "width": 0.0907
 +    },
 +    {
 +      "label": "symbol_alpha",
-+      "width": 0.1103
++      "width": 0.0907
 +    },
 +    {
-+      "label": "emoji",
-+      "width": 0.0735
++      "label": "!icon/settings|!code/-301",
++      "type": "function",
++      "width": 0.0611
 +    },
 +    {
 +      "label": "space"
@@ -117,141 +174,196 @@ index 0000000..3a348ea
 +      "$": "keyboard_state_selector",
 +      "languageKeyEnabled": {
 +        "label": "language_switch",
-+        "width": 0.0735
++        "width": 0.0611
 +      }
 +    },
 +    {
 +      "label": "left",
 +      "type": "function",
-+      "width": 0.0699
++      "width": 0.058
 +    },
 +    {
 +      "label": "down",
 +      "type": "function",
-+      "width": 0.0699
++      "width": 0.058
 +    },
 +    {
 +      "label": "right",
 +      "type": "function",
-+      "width": 0.0699
++      "width": 0.058
++    },
++    {
++      "type": "placeholder",
++      "width": 0.0266
++    },
++    {
++      "label": ".",
++      "type": "numeric",
++      "width": 0.055
++    },
++    {
++      "label": "0",
++      "type": "numeric",
++      "width": 0.055
++    },
++    {
++      "label": "action",
++      "width": 0.055
++    },
++    {
++      "label": "+",
++      "type": "function",
++      "width": 0.055
 +    }
 +  ]
 +]
 diff --git a/app/src/main/assets/layouts/main/galaxy_view.json b/app/src/main/assets/layouts/main/galaxy_view.json
 new file mode 100644
-index 0000000..05de2e2
+index 0000000..5cd2b85
 --- /dev/null
 +++ b/app/src/main/assets/layouts/main/galaxy_view.json
-@@ -0,0 +1,113 @@
+@@ -0,0 +1,145 @@
 +[
 +  [
 +    {
-+      "label": "q"
++      "label": "q",
++      "width": 0.056
 +    },
 +    {
-+      "label": "w"
++      "label": "w",
++      "width": 0.056
 +    },
 +    {
-+      "label": "e"
++      "label": "e",
++      "width": 0.056
 +    },
 +    {
-+      "label": "r"
++      "label": "r",
++      "width": 0.056
 +    },
 +    {
-+      "label": "t"
++      "label": "t",
++      "width": 0.056
 +    },
 +    {
-+      "label": "y"
++      "label": "y",
++      "width": 0.056
 +    },
 +    {
-+      "label": "u"
++      "label": "u",
++      "width": 0.056
 +    },
 +    {
-+      "label": "i"
++      "label": "i",
++      "width": 0.056
 +    },
 +    {
-+      "label": "o"
++      "label": "o",
++      "width": 0.056
 +    },
 +    {
-+      "label": "p"
++      "label": "p",
++      "width": 0.056
 +    }
 +  ],
 +  [
 +    {
-+      "label": "a"
++      "label": "a",
++      "width": 0.05599
 +    },
 +    {
-+      "label": "s"
++      "label": "s",
++      "width": 0.05599
 +    },
 +    {
-+      "label": "d"
++      "label": "d",
++      "width": 0.05599
 +    },
 +    {
-+      "label": "f"
++      "label": "f",
++      "width": 0.05599
 +    },
 +    {
-+      "label": "g"
++      "label": "g",
++      "width": 0.05599
 +    },
 +    {
-+      "label": "h"
++      "label": "h",
++      "width": 0.05599
 +    },
 +    {
-+      "label": "j"
++      "label": "j",
++      "width": 0.05599
 +    },
 +    {
-+      "label": "k"
++      "label": "k",
++      "width": 0.05599
 +    },
 +    {
-+      "label": "l"
++      "label": "l",
++      "width": 0.05599
 +    },
 +    {
 +      "$": "shift_state_selector",
 +      "manualOrLocked": {
-+        "label": "\""
++        "label": "\"",
++        "width": 0.05599
 +      },
 +      "default": {
-+        "label": "'"
++        "label": "'",
++        "width": 0.05599
 +      }
 +    }
 +  ],
 +  [
 +    {
-+      "label": "z"
++      "label": "z",
++      "width": 0.0561
 +    },
 +    {
-+      "label": "x"
++      "label": "x",
++      "width": 0.0561
 +    },
 +    {
-+      "label": "c"
++      "label": "c",
++      "width": 0.0561
 +    },
 +    {
-+      "label": "v"
++      "label": "v",
++      "width": 0.0561
 +    },
 +    {
-+      "label": "b"
++      "label": "b",
++      "width": 0.0561
 +    },
 +    {
-+      "label": "n"
++      "label": "n",
++      "width": 0.0561
 +    },
 +    {
-+      "label": "m"
++      "label": "m",
++      "width": 0.0561
 +    },
 +    {
 +      "$": "shift_state_selector",
 +      "manualOrLocked": {
-+        "label": "!"
++        "label": "!",
++        "width": 0.0561
 +      },
 +      "default": {
-+        "label": ","
++        "label": ",",
++        "width": 0.0561
 +      }
 +    },
 +    {
 +      "$": "shift_state_selector",
 +      "manualOrLocked": {
-+        "label": "?"
++        "label": "?",
++        "width": 0.0561
 +      },
 +      "default": {
-+        "label": "."
++        "label": ".",
++        "width": 0.0561
 +      }
 +    }
 +  ]
@@ -369,7 +481,7 @@ index e14e10b..c9a94c7 100644
          AUTOFILL_BACKGROUND_CHIP -> if (themeStyle == STYLE_MATERIAL && !hasKeyBorders) background else adjustedBackground
          GESTURE_PREVIEW, POPUP_KEYS_BACKGROUND, MORE_SUGGESTIONS_BACKGROUND, KEY_PREVIEW_BACKGROUND -> adjustedBackground
 diff --git a/app/src/main/java/helium314/keyboard/latin/settings/Defaults.kt b/app/src/main/java/helium314/keyboard/latin/settings/Defaults.kt
-index 9bf0ec7..0c754f5 100644
+index 9bf0ec7..975e93b 100644
 --- a/app/src/main/java/helium314/keyboard/latin/settings/Defaults.kt
 +++ b/app/src/main/java/helium314/keyboard/latin/settings/Defaults.kt
 @@ -31,7 +31,7 @@ object Defaults {
@@ -397,15 +509,24 @@ index 9bf0ec7..0c754f5 100644
      const val PREF_CUSTOM_ICON_NAMES = ""
      const val PREF_TOOLBAR_CUSTOM_KEY_CODES = ""
      const val PREF_AUTO_CAP = true
-@@ -136,7 +136,7 @@ object Defaults {
-     @SuppressLint("RtlHardcoded")
-     const val PREF_ONE_HANDED_GRAVITY = Gravity.LEFT
-     const val PREF_ONE_HANDED_SCALE = 1f
--    const val PREF_SHOW_NUMBER_ROW = false
-+    const val PREF_SHOW_NUMBER_ROW = true
-     const val PREF_SHOW_NUMBER_ROW_IN_SYMBOLS = true
+@@ -93,7 +93,7 @@ object Defaults {
+     // DEFAULT_SIZE_SCALE for portrait, 0 for landscape (normal and folded)
+     val PREF_BOTTOM_PADDING_SCALE = arrayOf(DEFAULT_SIZE_SCALE, 0f, DEFAULT_SIZE_SCALE, 0f)
+     @JvmField
+-    val PREF_SIDE_PADDING_SCALE = Array(8) { 0f }
++    val PREF_SIDE_PADDING_SCALE = arrayOf(0f, 0.92f, 0f, 0f, 0f, 0.92f, 0f, 0f)
+     @JvmField
+     val PREF_KEY_GAP_SCALE = Array(4) { DEFAULT_SIZE_SCALE }
+     const val PREF_FONT_SCALE = DEFAULT_SIZE_SCALE
+@@ -141,7 +141,7 @@ object Defaults {
      const val PREF_LOCALIZED_NUMBER_ROW = true
      const val PREF_SHOW_NUMBER_ROW_HINTS = false
+     const val PREF_CUSTOM_CURRENCY_KEY = ""
+-    const val PREF_SHOW_HINTS = true
++    const val PREF_SHOW_HINTS = false  // stock Samsung keyboard shows no key hints
+     const val PREF_POPUP_KEYS_ORDER = POPUP_KEYS_ORDER_DEFAULT
+     const val PREF_POPUP_KEYS_HINT_ORDER = POPUP_KEYS_LABEL_DEFAULT
+     const val PREF_SHOW_POPUP_HINTS = false
 diff --git a/app/src/main/res/values/bools.xml b/app/src/main/res/values/bools.xml
 index b089f94..481b3fd 100644
 --- a/app/src/main/res/values/bools.xml
