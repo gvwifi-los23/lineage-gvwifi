@@ -1,0 +1,36 @@
+diff --git a/manifest.xml b/manifest.xml
+index 7b70a31..53d435f 100644
+--- a/manifest.xml
++++ b/manifest.xml
+@@ -86,15 +86,6 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
+-    <hal format="hidl">
+-        <name>android.hardware.light</name>
+-        <transport>hwbinder</transport>
+-        <version>2.0</version>
+-        <interface>
+-            <name>ILight</name>
+-            <instance>default</instance>
+-        </interface>
+-    </hal>
+     <hal format="hidl">
+         <name>android.hardware.media.omx</name>
+         <transport>hwbinder</transport>
+@@ -108,15 +99,6 @@
+             <instance>default</instance>
+         </interface>
+     </hal>
+-    <hal format="hidl">
+-        <name>android.hardware.memtrack</name>
+-        <transport arch="32">passthrough</transport>
+-        <version>1.0</version>
+-        <interface>
+-            <name>IMemtrack</name>
+-            <instance>default</instance>
+-        </interface>
+-    </hal>
+     <hal format="hidl">
+         <name>android.hardware.sensors</name>
+         <transport arch="32">passthrough</transport>

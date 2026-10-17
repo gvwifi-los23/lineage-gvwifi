@@ -1,0 +1,17 @@
+diff --git a/target/product/base_vendor.mk b/target/product/base_vendor.mk
+index fe48a30..f828a0d 100644
+--- a/target/product/base_vendor.mk
++++ b/target/product/base_vendor.mk
+@@ -80,7 +80,11 @@ PRODUCT_PACKAGES += \
+ # libhealthloop BPF filter. This is in base_vendor.mk because libhealthloop must
+ # be a static library and because the Android build system ignores 'required'
+ # sections for static libraries.
+-PRODUCT_PACKAGES += filterPowerSupplyEvents.o
++# gvwifi: not shipped. Android 17's version of this BPF filter hangs the platform
++# BpfLoader on the 3.10 kernel's BPF backport (it is loaded as "critical for
++# healthd", and init waits for the loader, so boot stops). Without it the health
++# HAL logs a warning and reads power-supply uevents unfiltered.
++# PRODUCT_PACKAGES += filterPowerSupplyEvents.o
+ 
+ # Base modules when shipping api level is less than or equal to 34
+ PRODUCT_PACKAGES_SHIPPING_API_LEVEL_34 += \

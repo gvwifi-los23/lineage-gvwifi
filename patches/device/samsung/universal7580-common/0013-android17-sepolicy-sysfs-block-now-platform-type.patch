@@ -1,0 +1,13 @@
+diff --git a/sepolicy/file.te b/sepolicy/file.te
+index 0db1bc1..97de585 100644
+--- a/sepolicy/file.te
++++ b/sepolicy/file.te
+@@ -43,7 +43,7 @@ type sysfs_wifi, fs_type, sysfs_type, mlstrustedobject;
+ type sysfs_usb_supply, sysfs_type, fs_type, mlstrustedobject;
+ type sysfs_mmc, sysfs_type, fs_type, mlstrustedobject;
+ type sysfs_graphics, sysfs_type, fs_type, mlstrustedobject;
+-type sysfs_block, sysfs_type, fs_type, mlstrustedobject;
++# sysfs_block: declared by the platform policy since Android 17
+ type sysfs_jack, sysfs_type, fs_type, mlstrustedobject;
+ type sysfs_v4l, sysfs_type, fs_type, mlstrustedobject;
+ type sysfs_sswap, sysfs_type, fs_type, mlstrustedobject;

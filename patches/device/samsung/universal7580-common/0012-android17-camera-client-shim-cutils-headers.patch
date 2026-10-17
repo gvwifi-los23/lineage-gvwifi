@@ -1,0 +1,13 @@
+diff --git a/libshims/libcamera_client/Android.mk b/libshims/libcamera_client/Android.mk
+index eb06c7e..a462122 100644
+--- a/libshims/libcamera_client/Android.mk
++++ b/libshims/libcamera_client/Android.mk
+@@ -24,6 +24,8 @@ LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+ LOCAL_PROPRIETARY_MODULE := true
+ 
+ LOCAL_SHARED_LIBRARIES := libcamera_metadata liblog
++# Android 17: camera_metadata.h includes cutils/compiler.h
++LOCAL_HEADER_LIBRARIES := libcutils_headers
+ LOCAL_C_INCLUDES := system/media/camera/include
+ 
+ include $(BUILD_SHARED_LIBRARY)

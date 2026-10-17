@@ -1,0 +1,15 @@
+diff --git a/device.mk b/device.mk
+index b15eb31..5aaea23 100644
+--- a/device.mk
++++ b/device.mk
+@@ -133,3 +133,10 @@ PRODUCT_DEXPREOPT_SPEED_APPS += \
+     Settings \
+     LatinIME \
+     HeliBoard
++
++# Android 17: BPF programs pick their variant from the kernel version. The 3.10
++# kernel reports 5.10 to the BPF loader, but its BPF backport lacks sk_storage,
++# which Android 17's 5.10 network programs use (netd.o ingress_stats_5_10_26q2:
++# 'unknown func bpf_sk_storage_get', bpfloader-failed reboot). Use the 5.4 variants.
++PRODUCT_SYSTEM_PROPERTIES += \
++    ro.bpf.kver_override=5.4.302

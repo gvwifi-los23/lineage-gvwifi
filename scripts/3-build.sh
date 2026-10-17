@@ -24,6 +24,14 @@ HB_APK="$(dirname "$0")/../tools/HeliBoard/out/HeliBoard.apk"
 [ -f "$HB_APK" ] || { echo "!! $HB_APK missing: run tools/HeliBoard/build.sh first"; exit 1; }
 cp "$HB_APK" "$TOP/device/samsung/gvwifi/HeliBoard/HeliBoard.apk"
 
+# Android 17: LineageOS 24 builds kernels with LLVM only; the 3.10 kernel needs GCC 4.9,
+# so it comes prebuilt from the LineageOS 23.2 tree (device patch gvwifi 0013).
+PK="$(dirname "$0")/../prebuilt-kernel"
+for f in kernel dt.img; do [ -f "$PK/$f" ] || { echo "!! $PK/$f missing"; exit 1; }; done
+mkdir -p "$TOP/device/samsung/gvwifi/prebuilt"
+cp "$PK/kernel" "$PK/dt.img" "$TOP/device/samsung/gvwifi/prebuilt/"
+echo "prebuilt kernel: $(strings "$PK/kernel" | grep -m1 "Linux version" | cut -c1-80)"
+
 # Signing. Public builds (default) sign with the owner's private release keys
 # via LineageOS inline signing (vendor/lineage-priv/keys/keys.mk ->
 # "release-keys"). PRIVATE=1 (owner build) stays on AOSP test-keys, so it keeps

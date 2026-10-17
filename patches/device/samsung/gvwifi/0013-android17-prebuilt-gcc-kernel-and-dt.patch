@@ -1,0 +1,15 @@
+diff --git a/BoardConfig.mk b/BoardConfig.mk
+index 27c7fa8..9b376a0 100644
+--- a/BoardConfig.mk
++++ b/BoardConfig.mk
+@@ -93,3 +93,10 @@ BOARD_RECOVERY_IMAGE_PREPARE = \
+ 	echo 'ro.adb.secure.recovery=0' >> $(TARGET_RECOVERY_ROOT_OUT)/prop.default ; \
+ 	echo 'ro.debuggable=1'          >> $(TARGET_RECOVERY_ROOT_OUT)/prop.default ; \
+ 	echo 'ro.secure=0'              >> $(TARGET_RECOVERY_ROOT_OUT)/prop.default
++
++# Android 17 (LineageOS 24) builds kernels with LLVM only and dropped GCC; this
++# 3.10 kernel needs GCC 4.9, so it is built by the LineageOS 23.2 tree and used
++# here as a prebuilt (same source and kernel patches). 3-build.sh copies it in.
++TARGET_FORCE_PREBUILT_KERNEL := true
++TARGET_PREBUILT_KERNEL := device/samsung/gvwifi/prebuilt/kernel
++BOARD_KERNEL_PREBUILT_DT := device/samsung/gvwifi/prebuilt/dt.img

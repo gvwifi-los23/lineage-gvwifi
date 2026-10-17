@@ -1,0 +1,17 @@
+diff --git a/bpf/loader/NetBpfLoad.cpp b/bpf/loader/NetBpfLoad.cpp
+index 7ba3247..d51876c 100644
+--- a/bpf/loader/NetBpfLoad.cpp
++++ b/bpf/loader/NetBpfLoad.cpp
+@@ -1576,8 +1576,10 @@ static int doLoad(char** argv, char * const envp[]) {
+     // 25Q4 bumps the kernel requirement up to 5.10
+     // see also: //system/netd/tests/kernel_test.cpp TestKernel510
+     if (isAtLeast25Q4 && !isAtLeastKernelVersion(5, 10)) {
+-        ALOGE("Android 25Q4 requires kernel 5.10.");
+-        return 7;
++        // gvwifi: the 3.10 kernel has a 5.4-level BPF backport (no sk_storage) and
++        // runs with ro.bpf.kver_override=5.4.x; 5.4 programs still work (as in
++        // LineageOS 23.2 "NetBpfLoad: Relax 5.10 kernel requirement").
++        ALOGW("Android 25Q4 requires kernel 5.10.");
+     }
+ 
+     // 26Q4 bumps the kernel requirement up to 5.15

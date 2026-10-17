@@ -1,0 +1,12 @@
+diff --git a/BoardConfigCommon.mk b/BoardConfigCommon.mk
+index e92daaf..e540b96 100644
+--- a/BoardConfigCommon.mk
++++ b/BoardConfigCommon.mk
+@@ -212,3 +212,7 @@ TARGET_LD_SHIM_LIBS += \
+     /system/bin/mediaserver|/system/lib/libstagefright_shim.so \
+     /system/lib/libsec-ril.so|/vendor/lib/libcutils_shim_exynos7580.so \
+     /system/lib/libsec-ril-dsds.so|/vendor/lib/libcutils_shim_exynos7580.so
++
++# Android 17: libui only accepts gralloc mapper 4/5 unless built with LEGACY_GRALLOC;
++# this device has mapper 2.0 only (composer aborted: 'gralloc-mapper is missing').
++$(call soong_config_set_bool,libui,legacy_gralloc,true)

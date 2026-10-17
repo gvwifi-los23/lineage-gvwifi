@@ -1,0 +1,34 @@
+diff --git a/hardware/audio/aidl/Module.cpp b/hardware/audio/aidl/Module.cpp
+index 65b9e56..84d542a 100644
+--- a/hardware/audio/aidl/Module.cpp
++++ b/hardware/audio/aidl/Module.cpp
+@@ -1131,4 +1131,13 @@ ndk::ScopedAStatus Module::getAAudioHardwareBurstMinUsec(int32_t* _aidl_return)
+     return ndk::ScopedAStatus::ok();
+ }
+ 
++ndk::ScopedAStatus Module::getFlushFromFrameSupport(
++        const AudioPortConfig& in_config,
++        ::aidl::android::media::audio::common::FlushFromFrameSupport* _aidl_return) {
++    (void)in_config;
++    (void)_aidl_return;
++    // Flushing from a given frame isn't supported by the legacy HAL.
++    return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
++}
++
+ }  // namespace aidl::android::hardware::audio::core
+diff --git a/hardware/audio/aidl/Module.h b/hardware/audio/aidl/Module.h
+index 0a9407e..9b2e08b 100644
+--- a/hardware/audio/aidl/Module.h
++++ b/hardware/audio/aidl/Module.h
+@@ -116,6 +116,11 @@ class Module : public BnModule {
+     ndk::ScopedAStatus supportsVariableLatency(bool* _aidl_return) override;
+     ndk::ScopedAStatus getAAudioMixerBurstCount(int32_t* _aidl_return) override;
+     ndk::ScopedAStatus getAAudioHardwareBurstMinUsec(int32_t* _aidl_return) override;
++    // IModule V4 (Android 17)
++    ndk::ScopedAStatus getFlushFromFrameSupport(
++            const ::aidl::android::media::audio::common::AudioPortConfig& in_config,
++            ::aidl::android::media::audio::common::FlushFromFrameSupport* _aidl_return)
++            override;
+ 
+     // Internal helper
+     audio_hw_device_t* getLegacyDevice() const { return mLegacyDevice; }

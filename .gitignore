@@ -10,6 +10,7 @@ keys.mk
 # Build output and downloads
 out/
 build/
+!patches/build/
 *.apk
 *.zip
 *.img

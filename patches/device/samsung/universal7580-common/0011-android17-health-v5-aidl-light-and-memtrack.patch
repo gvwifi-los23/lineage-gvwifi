@@ -1,0 +1,64 @@
+diff --git a/device-common.mk b/device-common.mk
+index 200ec7a..e541d06 100644
+--- a/device-common.mk
++++ b/device-common.mk
+@@ -126,9 +126,7 @@ PRODUCT_PACKAGES += \
+ 
+ # Lights
+ PRODUCT_PACKAGES += \
+-    lights.universal7580 \
+-    android.hardware.light@2.0-impl \
+-    android.hardware.light@2.0-service
++    android.hardware.light-service.samsung
+ 
+ # Media
+ PRODUCT_PACKAGES += \
+@@ -146,7 +144,7 @@ PRODUCT_COPY_FILES += \
+ 
+ # Memory
+ PRODUCT_PACKAGES += \
+-    android.hardware.memtrack@1.0-impl
++    android.hardware.memtrack-service.samsung-mali
+ 
+ # Cgroup configuration (v1 memory cgroup for lmkd)
+ PRODUCT_COPY_FILES += \
+diff --git a/hardware/health/Android.bp b/hardware/health/Android.bp
+index b6bfc5e..ea346ba 100644
+--- a/hardware/health/Android.bp
++++ b/hardware/health/Android.bp
+@@ -24,7 +24,7 @@ cc_defaults {
+         "libcutils",
+         "liblog",
+         "libutils",
+-        "android.hardware.health-V4-ndk",
++        "android.hardware.health-V5-ndk",
+         "libhidlbase",
+         "libpng",
+     ],
+diff --git a/hardware/health/android.hardware.health-service.universal7580.xml b/hardware/health/android.hardware.health-service.universal7580.xml
+index 8ddfbda..14828d4 100644
+--- a/hardware/health/android.hardware.health-service.universal7580.xml
++++ b/hardware/health/android.hardware.health-service.universal7580.xml
+@@ -1,7 +1,7 @@
+ <manifest version="1.0" type="device">
+     <hal format="aidl">
+         <name>android.hardware.health</name>
+-        <version>4</version>
++        <version>5</version>
+         <fqname>IHealth/default</fqname>
+     </hal>
+ </manifest>
+diff --git a/sepolicy/file_contexts b/sepolicy/file_contexts
+index dd33249..422c186 100644
+--- a/sepolicy/file_contexts
++++ b/sepolicy/file_contexts
+@@ -167,7 +167,8 @@
+ /(vendor|system/vendor)/bin/hw/vendor\.lineage\.livedisplay@2\.0-service\.samsung-exynos    u:object_r:hal_lineage_livedisplay_sysfs_exec:s0
+ /(vendor|system/vendor)/bin/hw/vendor\.lineage\.touch@1\.0-service\.samsung                 u:object_r:hal_lineage_touch_default_exec:s0
+ /(vendor|system/vendor)/bin/hw/android\.hardware\.drm@1\.3-service\.clearkey                u:object_r:hal_drm_clearkey_exec:s0
+-/(vendor|system/vendor)/bin/hw/android\.hardware\.light@2\.0-service\.samsung               u:object_r:hal_light_default_exec:s0
++/(vendor|system/vendor)/bin/hw/android\.hardware\.light-service\.samsung                     u:object_r:hal_light_default_exec:s0
++/(vendor|system/vendor)/bin/hw/android\.hardware\.memtrack-service\.samsung-mali             u:object_r:hal_memtrack_default_exec:s0
+ 
+ /(vendor|system/vendor)/bin/hw/android\.hardware\.power@1\.0-service\.exynos                u:object_r:hal_power_default_exec:s0
+ /(vendor|system/vendor)/bin/hw/android\.hardware\.nfc@1\.2-service\.samsung                 u:object_r:hal_nfc_default_exec:s0

@@ -1,6 +1,8 @@
+diff --git a/service/src/com/android/server/BpfNetMaps.java b/service/src/com/android/server/BpfNetMaps.java
+index c1a4799..275b819 100644
 --- a/service/src/com/android/server/BpfNetMaps.java
 +++ b/service/src/com/android/server/BpfNetMaps.java
-@@ -322,7 +322,13 @@
+@@ -639,7 +639,13 @@ public class BpfNetMaps {
          try {
              sUidOwnerMap.clear();
          } catch (ErrnoException e) {
@@ -11,11 +13,11 @@
 +            if (e.errno != android.system.OsConstants.ENOSYS) {
 +                throw new IllegalStateException("Failed to initialize uid owner map", e);
 +            }
-+            Log.w(TAG, "Could not clear uid owner map: " + e);
++            Log.w(TAG, "Could not clear sUidOwnerMap: " + e);
          }
  
          if (sUidPermissionMap == null) {
-@@ -348,7 +354,13 @@
+@@ -665,7 +671,13 @@ public class BpfNetMaps {
          try {
              sIngressDiscardMap.clear();
          } catch (ErrnoException e) {
@@ -26,36 +28,88 @@
 +            if (e.errno != android.system.OsConstants.ENOSYS) {
 +                throw new IllegalStateException("Failed to initialize ingress discard map", e);
 +            }
-+            Log.w(TAG, "Could not clear ingress discard map: " + e);
++            Log.w(TAG, "Could not clear sIngressDiscardMap: " + e);
          }
  
-         if (isAtLeast25Q2()) {
-@@ -358,7 +370,13 @@
-             try {
-                 sLocalNetAccessMap.clear();
-             } catch (ErrnoException e) {
--                throw new IllegalStateException("Failed to initialize local_net_access map", e);
-+                // gvwifi: the 3.10 BPF backport cannot delete from some map types
-+                // (ENOSYS). Only matters when system_server restarts; tolerate it
-+                // instead of crash-looping.
-+                if (e.errno != android.system.OsConstants.ENOSYS) {
-+                    throw new IllegalStateException("Failed to initialize local_net_access map", e);
-+                }
-+                Log.w(TAG, "Could not clear local_net_access map: " + e);
+         if (isAtLeastB()) {
+@@ -676,7 +688,13 @@ public class BpfNetMaps {
+                 try {
+                     sLocalNetAccessMap.clear();
+                 } catch (ErrnoException e) {
+-                    throw new IllegalStateException("Failed to initialize local_net_access map", e);
++                    // gvwifi: the 3.10 BPF backport cannot delete from some map types
++                    // (ENOSYS). Only matters when system_server restarts; tolerate it
++                    // instead of crash-looping.
++                    if (e.errno != android.system.OsConstants.ENOSYS) {
++                        throw new IllegalStateException("Failed to initialize local_net_access map", e);
++                    }
++                    Log.w(TAG, "Could not clear sLocalNetAccessMap: " + e);
+                 }
              }
  
-             if (sLocalNetBlockedUidMap == null) {
-@@ -367,8 +385,11 @@
+@@ -686,8 +704,14 @@ public class BpfNetMaps {
              try {
                  sLocalNetBlockedUidMap.clear();
              } catch (ErrnoException e) {
 -                throw new IllegalStateException("Failed to initialize local_net_blocked_uid map",
 -                        e);
++                // gvwifi: the 3.10 BPF backport cannot delete from some map types
++                // (ENOSYS). Only matters when system_server restarts; tolerate it
++                // instead of crash-looping.
 +                if (e.errno != android.system.OsConstants.ENOSYS) {
 +                    throw new IllegalStateException("Failed to initialize local_net_blocked_uid map",
 +                            e);
 +                }
-+                Log.w(TAG, "Could not clear local_net_blocked_uid map: " + e);
++                Log.w(TAG, "Could not clear sLocalNetBlockedUidMap: " + e);
+             }
+ 
+             synchronized (sLocalNetAccessLock) {
+@@ -697,8 +721,14 @@ public class BpfNetMaps {
+                 try {
+                     sLocalNetUidHostAllowlistMap.clear();
+                 } catch (ErrnoException e) {
+-                    throw new IllegalStateException(
+-                            "Failed to initialize local_net_uid_host_allowlist map", e);
++                    // gvwifi: the 3.10 BPF backport cannot delete from some map types
++                    // (ENOSYS). Only matters when system_server restarts; tolerate it
++                    // instead of crash-looping.
++                    if (e.errno != android.system.OsConstants.ENOSYS) {
++                        throw new IllegalStateException(
++                                "Failed to initialize local_net_uid_host_allowlist map", e);
++                    }
++                    Log.w(TAG, "Could not clear sLocalNetUidHostAllowlistMap: " + e);
+                 }
+             }
+ 
+@@ -731,8 +761,14 @@ public class BpfNetMaps {
+             try {
+                 sL4sEnabledMap.clear();
+             } catch (ErrnoException e) {
+-                throw new IllegalStateException("Failed to initialize l4s_accecn_status map",
+-                    e);
++                // gvwifi: the 3.10 BPF backport cannot delete from some map types
++                // (ENOSYS). Only matters when system_server restarts; tolerate it
++                // instead of crash-looping.
++                if (e.errno != android.system.OsConstants.ENOSYS) {
++                    throw new IllegalStateException("Failed to initialize l4s_accecn_status map",
++                        e);
++                }
++                Log.w(TAG, "Could not clear sL4sEnabledMap: " + e);
              }
          }
-     }
+ 
+@@ -782,7 +818,13 @@ public class BpfNetMaps {
+         try {
+             sUidPermissionChunkMap.clear();
+         } catch (ErrnoException e) {
+-            throw new IllegalStateException("Cannot clear uid permission chunk map", e);
++            // gvwifi: the 3.10 BPF backport cannot delete from some map types
++            // (ENOSYS). Only matters when system_server restarts; tolerate it
++            // instead of crash-looping.
++            if (e.errno != android.system.OsConstants.ENOSYS) {
++                throw new IllegalStateException("Cannot clear uid permission chunk map", e);
++            }
++            Log.w(TAG, "Could not clear sUidPermissionChunkMap: " + e);
+         }
+ 
+         if (SdkUtil.isAtLeast25Q4()) {

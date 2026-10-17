@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- gvwifi (Exynos 7580) never uses these; removing them cuts soong analysis memory. -->
+<manifest>
+  <remove-project name="LineageOS/android_hardware_qcom-caf_common" />
+  <remove-project name="LineageOS/android_hardware_qcom_audio" />
+  <remove-project name="LineageOS/android_hardware_qcom_audio-ar" />
+  <remove-project name="LineageOS/android_hardware_qcom_bootctrl" />
+  <remove-project name="LineageOS/android_hardware_qcom_display" />
+  <remove-project name="LineageOS/android_hardware_qcom_media" />
+  <remove-project name="LineageOS/android_hardware_qcom_sm7250_display" />
+  <remove-project name="LineageOS/android_hardware_qcom_sm7250_gps" />
+  <remove-project name="LineageOS/android_hardware_qcom_sm8150_display" />
+  <remove-project name="LineageOS/android_hardware_qcom_sm8150_gps" />
+  <remove-project name="LineageOS/android_hardware_qcom_thermal" />
+  <remove-project name="LineageOS/android_hardware_qcom_wlan" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_agm" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_arpal-lx" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_audio" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_audio-commonsys-intf" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_audio-hal_st-hal" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_audio-hal_st-hal-ar" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_audioreach-graphservices" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_core-utils-sys" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_core-utils-vendor" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_data-ipa-cfg-mgr" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_dataipa" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_dataservices" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_display" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_display-commonsys" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_display-commonsys-intf" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_display-core" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_display-intf" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_fm-commonsys" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_healthd-ext" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_interfaces" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_libfmjni" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_libqspa" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_libvmmem" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_power" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_thermal-engine" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_usb" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_vibrator" />
+  <remove-project name="LineageOS/android_vendor_qcom_opensource_wfd-commonsys" />
+</manifest>

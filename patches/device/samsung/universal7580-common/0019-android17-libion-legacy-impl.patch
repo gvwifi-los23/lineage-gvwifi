@@ -1,0 +1,12 @@
+diff --git a/BoardConfigCommon.mk b/BoardConfigCommon.mk
+index e540b96..b10fd0f 100644
+--- a/BoardConfigCommon.mk
++++ b/BoardConfigCommon.mk
+@@ -216,3 +216,7 @@ TARGET_LD_SHIM_LIBS += \
+ # Android 17: libui only accepts gralloc mapper 4/5 unless built with LEGACY_GRALLOC;
+ # this device has mapper 2.0 only (composer aborted: 'gralloc-mapper is missing').
+ $(call soong_config_set_bool,libui,legacy_gralloc,true)
++
++# Android 17: libion is a stub (every call returns -1) unless legacy_impl is set;
++# the Exynos gralloc allocates all buffers through it on the 3.10 ION kernel.
++$(call soong_config_set_bool,libion,legacy_impl,true)

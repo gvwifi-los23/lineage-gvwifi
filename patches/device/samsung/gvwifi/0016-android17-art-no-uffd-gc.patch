@@ -1,0 +1,13 @@
+diff --git a/device.mk b/device.mk
+index 5aaea23..44d5a34 100644
+--- a/device.mk
++++ b/device.mk
+@@ -140,3 +140,8 @@ PRODUCT_DEXPREOPT_SPEED_APPS += \
+ # 'unknown func bpf_sk_storage_get', bpfloader-failed reboot). Use the 5.4 variants.
+ PRODUCT_SYSTEM_PROPERTIES += \
+     ro.bpf.kver_override=5.4.302
++
++# Android 17: kernel 3.10 has no userfaultfd, so ART runs the concurrent-copying
++# GC (read barriers) and rejected the default boot image compiled for the
++# userfaultfd GC ('ValidateOatFile found read barrier state mismatch').
++PRODUCT_ENABLE_UFFD_GC := false

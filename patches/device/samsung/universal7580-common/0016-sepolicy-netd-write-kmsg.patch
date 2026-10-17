@@ -1,0 +1,11 @@
+diff --git a/sepolicy/netd.te b/sepolicy/netd.te
+index d573a1d..af8f54a 100644
+--- a/sepolicy/netd.te
++++ b/sepolicy/netd.te
+@@ -4,3 +4,6 @@ allow netd gpsd:fd use;
+ allow netd gpsd:tcp_socket { read write getopt setopt };
+ 
+ allow netd kernel:system module_request;
++# gvwifi Android 17: netd writes its init errors to /dev/kmsg (Connectivity patch
++# 0003), because netd1shot's failure reboots the device before logcat is saved.
++allow netd kmsg_device:chr_file w_file_perms;

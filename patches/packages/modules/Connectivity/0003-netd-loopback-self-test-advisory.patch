@@ -1,0 +1,92 @@
+diff --git a/bpf/netd/BpfHandler.cpp b/bpf/netd/BpfHandler.cpp
+index 9b57548..94a5300 100644
+--- a/bpf/netd/BpfHandler.cpp
++++ b/bpf/netd/BpfHandler.cpp
+@@ -18,6 +18,11 @@
+ 
+ #include "BpfHandler.h"
+ 
++#include <fcntl.h>
++#include <unistd.h>
++
++#include <string>
++
+ #include <linux/bpf.h>
+ #include <inttypes.h>
+ 
+@@ -244,6 +249,16 @@ static Result<void> initPrograms(const char* cg2_path) {
+     return {};
+ }
+ 
++// gvwifi: netd1shot's logcat is lost when its abort reboots the device, so also
++// write problems to the kernel log, which survives in /proc/last_kmsg.
++void kmsgLog(const std::string& msg) {
++    int fd = open("/dev/kmsg", O_WRONLY | O_CLOEXEC);
++    if (fd < 0) return;
++    std::string line = "<3>netd: " + msg + "\n";
++    (void)!write(fd, line.data(), line.size());
++    close(fd);
++}
++
+ BpfHandler::BpfHandler()
+     : mPerUidStatsEntriesLimit(PER_UID_STATS_ENTRIES_LIMIT),
+       mTotalUidStatsEntriesLimit(TOTAL_UID_STATS_ENTRIES_LIMIT) {}
+@@ -359,7 +374,10 @@ Result<void> BpfHandler::init(const char* cg2_path) {
+         }
+     }
+ 
+-    if (isAtLeast26Q2) {
++    // gvwifi: on the 3.10 kernel's BPF backport this self test is advisory: a
++    // failure is logged instead of failing init (which aborts netd1shot and
++    // reboots with reboot,netd1shot-fail).
++    if (isAtLeast26Q2) if (auto st = [&]() -> Result<void> {
+         // Simple boot time self test that verifies that loopback ip/tcp works
+         // (this triggers at least bpf cgroup inet_create/ingress/egress/inet_release hooks)
+ 
+@@ -457,6 +475,11 @@ Result<void> BpfHandler::init(const char* cg2_path) {
+         if (rcv != snd) return Error() << "wrong";
+ 
+         // all 3 sockets are closed automatically
++        return {};
++    }(); !st.ok()) {
++        std::string msg = "loopback self test failed (ignored): " + st.error().message();
++        ALOGW("%s", msg.c_str());
++        kmsgLog(msg);
+     }
+ 
+     return {};
+diff --git a/bpf/netd/BpfHandler.h b/bpf/netd/BpfHandler.h
+index 0d4f2ac..c66d5f8 100644
+--- a/bpf/netd/BpfHandler.h
++++ b/bpf/netd/BpfHandler.h
+@@ -16,6 +16,8 @@
+ 
+ #pragma once
+ 
++#include <string>
++
+ #include <android-base/result.h>
+ #include "bpf/BpfMap.h"
+ #include "netd.h"
+@@ -28,6 +30,9 @@ using android::bpf::BpfMapRW;
+ namespace android {
+ namespace net {
+ 
++// gvwifi: writes msg to /dev/kmsg (best effort).
++void kmsgLog(const std::string& msg);
++
+ class BpfHandler {
+   public:
+     BpfHandler();
+diff --git a/bpf/netd/NetdUpdatable.cpp b/bpf/netd/NetdUpdatable.cpp
+index 8b2b4dc..869fe82 100644
+--- a/bpf/netd/NetdUpdatable.cpp
++++ b/bpf/netd/NetdUpdatable.cpp
+@@ -32,6 +32,7 @@ int libnetd_updatable_init(const char* cg2_path) {
+     android::base::Result<void> ret = sBpfHandler.init(cg2_path);
+     if (!ret.ok()) {
+         LOG(ERROR) << __func__ << ": Failed: " << ret.error().message();
++        android::net::kmsgLog(std::string(__func__) + ": Failed: " + ret.error().message());
+         abort();
+     }
+     return 0;

@@ -1,0 +1,24 @@
+diff --git a/tools/mkbootimg.mk b/tools/mkbootimg.mk
+index 7e68760..6f68ba4 100644
+--- a/tools/mkbootimg.mk
++++ b/tools/mkbootimg.mk
+@@ -15,7 +15,18 @@
+ LOCAL_PATH := $(call my-dir)
+ 
+ ifeq ($(strip $(BOARD_KERNEL_SEPARATED_DT)),true)
+-ifneq ($(strip $(BOARD_KERNEL_PREBUILT_DT)),true)
++ifneq ($(filter-out true,$(strip $(BOARD_KERNEL_PREBUILT_DT))),)
++# BOARD_KERNEL_PREBUILT_DT names a prebuilt dt.img (Android 17: the kernel and its
++# DTBs are built by the LineageOS 23.2 tree, see device/samsung/gvwifi BoardConfig).
++INSTALLED_DTIMAGE_TARGET := $(PRODUCT_OUT)/dt.img
++$(INSTALLED_DTIMAGE_TARGET): $(BOARD_KERNEL_PREBUILT_DT)
++	$(call pretty,"Prebuilt dt image: $@")
++	$(hide) cp $< $@
++
++.PHONY: dtimage
++dtimage: $(INSTALLED_DTIMAGE_TARGET)
++
++else ifneq ($(strip $(BOARD_KERNEL_PREBUILT_DT)),true)
+ ifeq ($(strip $(BUILD_TINY_ANDROID)),true)
+ include system/tools/dtbtool/Android.mk
+ endif

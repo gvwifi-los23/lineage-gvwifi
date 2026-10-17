@@ -1,0 +1,12 @@
+diff --git a/manifest.xml b/manifest.xml
+index 53d435f..016329f 100644
+--- a/manifest.xml
++++ b/manifest.xml
+@@ -1,6 +1,6 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <!-- Comments, Legal notices, etc. here -->
+-<manifest version="1.0" type="device" target-level="5">
++<manifest version="1.0" type="device" target-level="7">
+     <hal format="hidl">
+         <name>android.hardware.bluetooth</name>
+         <transport>hwbinder</transport>

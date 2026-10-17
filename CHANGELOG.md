@@ -1,4 +1,28 @@
-# gvwifi LineageOS 23.2: changelog of all modifications
+# gvwifi LineageOS 24.0 (Android 17): changelog
+
+Branch `lineage-24.0`: LineageOS 24.0 (Android 17, `lineage_gvwifi-cp2a-userdebug`) for the Samsung
+Galaxy View **SM-T670**. It carries the complete 23.2 patch series (below) plus the Android 17 port.
+
+## 20261017: first Android 17 build
+`lineage-24.0-20261017-UNOFFICIAL-gvwifi.zip`, release-keys, security patch 2026-10-01,
+ROM zip SHA-256 `10183155a04490fba247738b10a1bf054b49aae237b5484f5f4795852f013e0d`.
+
+- Boots to the home screen with SELinux enforcing; installs over 23.2 without a wipe (same keys).
+- Kernel and dt.img prebuilt from the 23.2 tree (LineageOS 24 has no GCC kernel builds).
+- Android 17 fixes, all explained in [`docs/ANDROID-17.md`](docs/ANDROID-17.md):
+  - BPF on kernel 3.10: 5.4 program variants (`ro.bpf.kver_override`), relaxed loader gate,
+    `filterPowerSupplyEvents.o` not shipped, 5.4 traffic-stats programs on Android 17,
+    ring-buffer event handlers optional, netd self-test advisory with errors in the kernel log
+    (Connectivity 0002-0005, build/make 0001, gvwifi 0015, common 0016);
+  - graphics: legacy gralloc mapper accepted, real ION library, `/dev/ion` SELinux label and access
+    (common 0017-0019);
+  - ART: boot image built for the concurrent-copying GC (no userfaultfd on 3.10; gvwifi 0016);
+  - build/HAL updates: VINTF level 7, AIDL light/memtrack, health V5, audio IModule v4, camera shim
+    headers, `sysfs_block` (gvwifi 0012-0014, common 0011-0015).
+
+---
+
+# gvwifi LineageOS 23.2 changes (carried into 24.0)
 
 Base: LineageOS 23.2 (Android 16, `lineage_gvwifi-bp4a-userdebug`) from the github.com/gvwifi
 trees, kernel 3.10.108 (Exynos 7580), for the Samsung Galaxy View **SM-T670**.

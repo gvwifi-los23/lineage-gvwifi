@@ -1,0 +1,32 @@
+diff --git a/bpf/progs/netd.c b/bpf/progs/netd.c
+index e4cd7c9..79ffa17 100644
+--- a/bpf/progs/netd.c
++++ b/bpf/progs/netd.c
+@@ -1001,8 +1001,11 @@ DEFINE_NETD_BPF_PROG_RANGES(ingress, stats, 5_10, INF, 25Q2, 25Q4)
+     return bpf_traffic_account(skb, INGRESS, KVER_5_10, API(25Q2));
+ }
+ 
+-// Android 25Q2/25Q3 5.4 (localnet protection)
+-DEFINE_NETD_BPF_PROG_RANGES(ingress, stats, 5_4, 5_10, 25Q2, 25Q4)
++// Android 25Q2+ 5.4 (localnet protection)
++// gvwifi: also used on 25Q4+ (upstream has no 5.4 variant there, so netd1shot
++// aborts with 'Failed to get program ... prog_netd_ingress_stats'). The 3.10
++// kernel runs with ro.bpf.kver_override=5.4.x; 5.10+ kernels keep their variants.
++DEFINE_NETD_BPF_PROG_RANGES(ingress, stats, 5_4, 5_10, 25Q2, MAXAPI)
+ (struct __sk_buff* skb) {
+     return bpf_traffic_account(skb, INGRESS, KVER_5_4, API(25Q2));
+ }
+@@ -1057,8 +1060,11 @@ DEFINE_NETD_BPF_PROG_RANGES(egress, stats, 5_10, INF, 25Q2, 25Q4)
+     return bpf_traffic_account(skb, EGRESS, KVER_5_10, API(25Q2));
+ }
+ 
+-// Android 25Q2/25Q3 5.4 (localnet protection)
+-DEFINE_NETD_BPF_PROG_RANGES(egress, stats, 5_4, 5_10, 25Q2, 25Q4)
++// Android 25Q2+ 5.4 (localnet protection)
++// gvwifi: also used on 25Q4+ (upstream has no 5.4 variant there, so netd1shot
++// aborts with 'Failed to get program ... prog_netd_egress_stats'). The 3.10
++// kernel runs with ro.bpf.kver_override=5.4.x; 5.10+ kernels keep their variants.
++DEFINE_NETD_BPF_PROG_RANGES(egress, stats, 5_4, 5_10, 25Q2, MAXAPI)
+ (struct __sk_buff* skb) {
+     return bpf_traffic_account(skb, EGRESS, KVER_5_4, API(25Q2));
+ }
