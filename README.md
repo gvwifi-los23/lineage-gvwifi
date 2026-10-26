@@ -40,6 +40,17 @@ Builds are signed with release keys from `~/gvwifi-keys/release` when present (t
 **not** published); otherwise with AOSP test keys, which can't be installed over a release-keys build
 without wiping data.
 
+### This fork: own keys and monthly builds
+1. Once: `CN="Your Name" scripts/4-make-keys.sh` makes this fork's release keys in `~/gvwifi-keys/release`
+   (refuses to overwrite). Back that folder up off the PC: every later update needs the same keys.
+   Moving a tablet from the original maintainer's build to these keys needs one data wipe.
+2. Once: `git remote add upstream https://github.com/gvwifi-los23/lineage-gvwifi`
+3. Every month, after LineageOS merges the security patch: `scripts/5-monthly.sh`. It merges new
+   upstream kit commits (stops on a conflict), reports new commits on the pinned gvwifi trees without
+   following them, restores patched files so `repo sync` can move them, syncs, rebuilds HeliBoard only if
+   its patches changed, builds, and warns when the security patch is the same as the last build's.
+4. Keep TWRP's `security_patch` at or below the oldest ROM in use (see `twrp-gvwifi`).
+
 ## Docs
 - [`docs/BUILD-KIT.md`](docs/BUILD-KIT.md): every fix and why (freezes, SELinux, HWC fences, BPF, ART, ...)
 - [`docs/FLASHING.md`](docs/FLASHING.md): stock to this ROM with Odin + recovery sideload
