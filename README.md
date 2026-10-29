@@ -53,7 +53,7 @@ without wiping data.
 - Charging only via the 19 V barrel adapter; micro-USB doesn't charge (it shows Discharging).
 - The bootloader (S-Boot T670UEU2APJ1) loads the whole boot/recovery image at `0x40204800` and
   copies the ramdisk to `0x42000000`: images over ~31.4 MB don't boot.
-- Key combos: recovery = Power + Volume Up; download mode = Power + Volume Down + Home;
+- Key combos: recovery = Power + Volume Up; download mode = Power + Volume Up + Volume Down (no Home button on this tablet);
   force restart = Power + Volume Down.
 
 ## Licenses

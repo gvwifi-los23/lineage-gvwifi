@@ -1,6 +1,6 @@
 # Run BEFORE flashing anything built here. Read-only on the tablet.
 #
-# Needs: tablet booted into TWRP 3.2.1-0 (it has root adb), USB cable,
+# Needs: tablet booted into TWRP (twrp-gvwifi release; it has root adb), USB cable,
 #        adb.exe on PATH (Android SDK platform-tools).
 #
 # 1. Backs up EFS (IMEI/serial/MAC/calibration; cannot be regenerated) to .\backup\
