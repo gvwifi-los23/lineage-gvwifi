@@ -3,16 +3,21 @@
 Everything here flashes a **Wi-Fi SM-T670 (`gvwifi`)** from Samsung stock firmware to this
 build. **Doing this from stock erases the tablet.**
 
-| Folder | What |
+## What to download
+| What | Where |
 |---|---|
-| `1-odin/` | Odin 3.10.7 (Windows flasher for Samsung download mode) |
-| `2-recovery/` | LineageOS recovery for Odin, built with this ROM. Its kernel keeps SELinux permissive in recovery. Tested: sideload, then reboot to system |
-| `2-recovery/fallback-20260923-1408/` | An older recovery, used for this ROM's development installs. Use it only if the main one misbehaves (its kernel lacks the USB freeze fix, so sideload can stall) |
-| `3-rom/` | ROM zip + SHA-256 |
-| `4-apps/` | Optional: microG Services and microG Companion 0.3.17 (official; include Play *Age Signals*), Aurora Store and NewPipe 0.29.1 (F-Droid builds). Install whichever you want with `adb install --no-streaming <file>.apk` |
-| `5-scripts/` | `device-check.ps1` (backup EFS + verify partition layout), `post-install.ps1` (optional: microG permissions + disable unused system apps; the built-in gvwifi Tweaks app does the same without a PC), `disabled-apps.txt` |
-| `optional-twrp-backup/` | TWRP 3.2.1-0 for Odin, only needed for the backup/check step |
-| `SHA256SUMS.txt` | Checksums for every file here |
+| ROM zip + SHA-256 | [lineage-gvwifi releases](https://github.com/gvwifi-los23/lineage-gvwifi/releases/latest) |
+| LineageOS Recovery (Odin tar) | [lineage-recovery-gvwifi releases](https://github.com/gvwifi-los23/lineage-recovery-gvwifi/releases/latest) |
+| TWRP (Odin tar), for the backup in step 1 | [twrp-gvwifi releases](https://github.com/gvwifi-los23/twrp-gvwifi/releases/latest) |
+| `device-check.ps1` (EFS backup + layout check) | [`scripts/device-check.ps1`](../scripts/device-check.ps1) in this repo (or *Code > Download ZIP*) |
+| Odin 3.10.7 | Samsung's Windows flasher; not hosted here, widely mirrored |
+| Samsung USB driver, Android SDK Platform-Tools (adb) | Samsung and Google |
+| Optional: microG Services + Companion 0.3.17 or newer | [microG releases](https://github.com/microg/GmsCore/releases) / [microg.org](https://microg.org/download.html) |
+
+**Buttons:** the SM-T670 has no Home button. **Download mode:** power off, then hold
+**Power + Volume Up + Volume Down** until the warning screen, and press **Volume Up** to continue.
+**Recovery:** hold **Power + Volume Up**. **Force restart:** hold **Power + Volume Down** until the
+screen goes off.
 
 ## You need
 - A Windows PC with the **Samsung USB driver** and **adb** (Android SDK Platform-Tools,
@@ -28,28 +33,30 @@ build. **Doing this from stock erases the tablet.**
 *"Custom binary blocked by FRP lock"*.
 
 **1. Backup and layout check (strongly recommended; EFS can't be regenerated).**
-Flash `optional-twrp-backup/twrp_3.2.1-0_sm-t670.tar` with Odin (same method as step 2) and
-boot into TWRP. Then on the PC, from `5-scripts`:
+Flash the TWRP tar from [twrp-gvwifi](https://github.com/gvwifi-los23/twrp-gvwifi/releases/latest)
+with Odin (same method as step 2) and boot into TWRP (Power + Volume Up). Then on the PC, in the
+folder where you saved `device-check.ps1`:
 `powershell -ExecutionPolicy Bypass -File device-check.ps1`
-It saves EFS and the other small partitions to `flash-kit\backup\` and compares the real
+It saves EFS and the other small partitions to a `backup\` folder and compares the real
 partition sizes with what the build expects. **If it reports a mismatch (e.g. a HIDDEN
 partition), stop:** this build would bootloop on that unit.
 
 **2. Flash LineageOS recovery with Odin.**
-- Power off. Hold **Volume Down + Home + Power**; at the warning press **Volume Up**.
+- Power off. Hold **Power + Volume Up + Volume Down**; at the warning press **Volume Up**.
 - Run Odin 3.10.7. The ID:COM box turns blue when the tablet is seen.
-- *Options*: **untick Auto Reboot**. **AP** = `2-recovery/lineage-recovery-gvwifi.tar`. Start and wait for **PASS**.
-- Hold **Volume Down + Home + Power** until the screen goes off, then **immediately** switch to
-  **Volume Up + Home + Power** and hold until LineageOS Recovery appears.
+- *Options*: **untick Auto Reboot**. **AP** = `lineage-recovery-gvwifi.tar`. Start and wait for **PASS**.
+- Hold **Power + Volume Down** until the screen goes off, then **immediately** switch to
+  **Power + Volume Up** and hold until LineageOS Recovery appears.
 
 **3. Wipe (required when coming from stock).** In recovery: *Factory reset* > **Format
 data / factory reset** > confirm.
 
 **4. Sideload the ROM.** Check the zip first:
-`certutil -hashfile 3-rom\lineage-23.2-20261016-UNOFFICIAL-gvwifi.zip SHA256`
-must be `28fc87589a14c2c128925fe30b365140026da334a3f998ca9b2d0311bee22c2e`.
+`certutil -hashfile lineage-23.2-20261016-UNOFFICIAL-gvwifi.zip SHA256`
+must match the `.sha256` file in the release (for 20261016:
+`2dc6b85a0aa117557a7b3e5b86fa776a70eefa200be91107ca3eeca6866ebfc0`).
 Then in recovery: *Apply update* > *Apply from ADB*, and on the PC:
-`adb sideload 3-rom\lineage-23.2-20261016-UNOFFICIAL-gvwifi.zip`
+`adb sideload lineage-23.2-20261016-UNOFFICIAL-gvwifi.zip`
 - The PC shows the progress stopping near **47%** with `Total xfer: 1.00x`. That's **normal**.
 - If the tablet says *Now send the package* but `adb devices` shows nothing, run
   `adb kill-server` on the PC and try again. If it still doesn't appear, choose *Reboot to
@@ -62,12 +69,12 @@ ever fails to finish, the kernel restarts into recovery after 15 minutes, with t
 
 **6. Setup wizard.** The ROM already has the performance tuning (0.5x animations, 60 Hz,
 1 cached app, battery %, core apps speed-compiled). Everything after this is optional.
-- **Apps:** to install from `4-apps` (or any APK), turn on USB debugging again and run
+- **Apps:** to install an APK (e.g. microG), turn on USB debugging again and run
   `adb install --no-streaming <file>.apk`.
 - **gvwifi Tweaks** (in the app drawer): if you installed microG, open it and tap **Apply**
   to grant microG its permissions and battery exemption. It can also disable unused system
   apps (one checkbox each; untick any you use). Nothing changes until you tap Apply.
-- PC alternative: `5-scripts/post-install.ps1` does the same over adb.
+- PC alternative: [`scripts/post-install.ps1`](../scripts/post-install.ps1) does the same over adb.
 
 ## Notes
 - **microG:** use official microG 0.3.17 or newer. It includes Google Play's *Age Signals*
@@ -83,7 +90,7 @@ ever fails to finish, the kernel restarts into recovery after 15 minutes, with t
 
 ## Upgrading from an earlier build of this ROM
 **1. Recovery (once).** Recoveries from before this build lose USB after the first sideload
-(fixed in this kernel). Flash `2-recovery/lineage-recovery-gvwifi.tar` with Odin (step 2
+(fixed in this kernel). Flash `lineage-recovery-gvwifi.tar` with Odin (step 2
 above). If you skip this, the sideload still works: if the PC loses the tablet afterward,
 tap *Reboot system now*.
 
